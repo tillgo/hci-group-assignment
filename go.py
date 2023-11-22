@@ -1,6 +1,6 @@
-from PyQt6.QtGui import QGuiApplication
-from PyQt6.QtWidgets import QMainWindow
+from PyQt6.QtWidgets import QApplication, QMainWindow, QDockWidget
 from PyQt6.QtCore import Qt
+
 from board import Board
 from score_board import ScoreBoard
 
@@ -18,11 +18,10 @@ class Go(QMainWindow):
         return self.scoreBoard
 
     def initUI(self):
-        """
-        initiates application UI
-        """
+        '''Initiates application UI'''
         self.board = Board(self)
         self.setCentralWidget(self.board)
+
         self.scoreBoard = ScoreBoard()
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.scoreBoard)
         self.scoreBoard.make_connection(self.board)
@@ -32,8 +31,16 @@ class Go(QMainWindow):
         self.setWindowTitle('Go')
         self.show()
 
+
     def center(self):
-        """centers the window on the screen"""
-        screen = QGuiApplication.primaryScreen().screenGeometry()
+        '''Centers the window on the screen'''
+        screen = QApplication.primaryScreen().availableGeometry()
         size = self.geometry()
-        self.move((screen.width() - size.width()) / 2, (screen.height() - size.height()) / 2)
+        x = (screen.width() - size.width()) // 2
+        y = (screen.height() - size.height()) // 2
+        self.move(x, y)
+
+
+
+
+

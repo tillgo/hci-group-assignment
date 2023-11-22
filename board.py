@@ -1,17 +1,17 @@
 from PyQt6.QtWidgets import QFrame
-from PyQt6.QtCore import Qt, QBasicTimer, pyqtSignal, QPoint
-from PyQt6.QtGui import QPainter
-from piece import Piece
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal
+from PyQt6.QtGui import QPainter, QColor, QBrush
+
 
 class Board(QFrame):  # base the board on a QFrame widget
-    updateTimerSignal = pyqtSignal(int) # signal sent when timer is updated
-    clickLocationSignal = pyqtSignal(str) # signal sent when there is a new click location
+    updateTimerSignal = pyqtSignal(int)  # signal sent when the timer is updated
+    clickLocationSignal = pyqtSignal(str)  # signal sent when there is a new click location
 
     # TODO set the board width and height to be square
-    boardWidth  = 0     # board is 0 squares wide # TODO this needs updating
-    boardHeight = 0     #
-    timerSpeed  = 1     # the timer updates ever 1 second
-    counter     = 10    # the number the counter will count down from
+    boardWidth = 500  # board is 0 squares wide # TODO this needs updating
+    boardHeight = 500  #
+    timerSpeed = 1000  # the timer updates every 1 second
+    counter = 10  # the number the counter will count down from
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -19,12 +19,13 @@ class Board(QFrame):  # base the board on a QFrame widget
 
     def initBoard(self):
         '''initiates board'''
-        self.timer = QBasicTimer()  # create a timer for the game
-        self.isStarted = False      # game is not currently started
-        self.start()                # start the game which will start the timer
+        self.timer = QTimer(self)  # create a timer for the game
+        self.timer.timeout.connect(self.timerEvent)  # connect timeout signal to timerEvent method
+        self.isStarted = False  # game is not currently started
+        self.start()  # start the game which will start the timer
 
-        self.boardArray =[]         # TODO - create a 2d int/Piece array to store the state of the game
-        # self.printBoardArray()    # TODO - uncomment this method after create the array above
+        self.boardArray = []  # TODO - create a 2d int/Piece array to store the state of the game
+        # self.printBoardArray()    # TODO - uncomment this method after creating the array above
 
     def printBoardArray(self):
         '''prints the boardArray in an attractive way'''
@@ -33,6 +34,7 @@ class Board(QFrame):  # base the board on a QFrame widget
 
     def mousePosToColRow(self, event):
         '''convert the mouse click event to a row and column'''
+        pass  # Implement this method according to your logic
 
     def squareWidth(self):
         '''returns the width of one square in the board'''
@@ -44,34 +46,31 @@ class Board(QFrame):  # base the board on a QFrame widget
 
     def start(self):
         '''starts game'''
-        self.isStarted = True                       # set the boolean which determines if the game has started to TRUE
-        self.resetGame()                            # reset the game
-        self.timer.start(self.timerSpeed, self)     # start the timer with the correct speed
+        self.isStarted = True  # set the boolean which determines if the game has started to TRUE
+        self.resetGame()  # reset the game
+        self.timer.start(self.timerSpeed)  # start the timer with the correct speed
         print("start () - timer is started")
 
-    def timerEvent(self, event):
+    def timerEvent(self):
         '''this event is automatically called when the timer is updated. based on the timerSpeed variable '''
-        # TODO adapter this code to handle your timers
-        if event.timerId() == self.timer.timerId():  # if the timer that has 'ticked' is the one in this class
-            if Board.counter == 0:
-                print("Game over")
-            self.counter -= 1
-            print('timerEvent()', self.counter)
-            self.updateTimerSignal.emit(self.counter)
-        else:
-            super(Board, self).timerEvent(event)      # if we do not handle an event we should pass it to the super
-                                                        # class for handelingother wise pass it to the super class for handling
+        # TODO adapt this code to handle your timers
+        if Board.counter == 0:
+            print("Game over")
+        self.counter -= 1
+        print('timerEvent()', self.counter)
+        self.updateTimerSignal.emit(self.counter)
 
     def paintEvent(self, event):
         '''paints the board and the pieces of the game'''
-        # painter = QPainter(self)
-        # self.drawBoardSquares(painter)
-        # self.drawPieces(painter)
+        painter = QPainter(self)
+        self.drawBoardSquares(painter)
+        self.drawPieces(painter)
 
     def mousePressEvent(self, event):
         '''this event is automatically called when the mouse is pressed'''
-        clickLoc = "click location ["+str(event.x())+","+str(event.y())+"]"     # the location where a mouse click was registered
-        print("mousePressEvent() - "+clickLoc)
+        clickLoc = "click location [" + str(event.x()) + "," + str(
+            event.y()) + "]"  # the location where a mouse click was registered
+        print("mousePressEvent() - " + clickLoc)
         # TODO you could call some game logic here
         self.clickLocationSignal.emit(clickLoc)
 
@@ -81,30 +80,28 @@ class Board(QFrame):  # base the board on a QFrame widget
 
     def tryMove(self, newX, newY):
         '''tries to move a piece'''
+        pass  # Implement this method according to your logic
 
     def drawBoardSquares(self, painter):
         '''draw all the square on the board'''
-        # TODO set the default colour of the brush
+        squareWidth = self.squareWidth()
+        squareHeight = self.squareHeight()
         for row in range(0, Board.boardHeight):
-            for col in range (0, Board.boardWidth):
+            for col in range(0, Board.boardWidth):
                 painter.save()
-                colTransformation = self.squareWidth()* col # TODO set this value equal the transformation in the column direction
-                rowTransformation = 0                       # TODO set this value equal the transformation in the row direction
-                painter.translate(colTransformation,rowTransformation)
-                painter.fillRect()                          # TODO provide the required arguments
+                painter.translate(col * squareWidth, row * squareHeight)
+                painter.setBrush(QBrush(QColor(255, 255, 255)))  # Set brush color
+                painter.drawRect(0, 0, squareWidth, squareHeight)  # Draw rectangles
                 painter.restore()
-                # TODO change the colour of the brush so that a checkered board is drawn
 
     def drawPieces(self, painter):
-        '''draw the prices on the board'''
-        colour = Qt.transparent # empty square could be modeled with transparent pieces
+        '''draw the pieces on the board'''
         for row in range(0, len(self.boardArray)):
             for col in range(0, len(self.boardArray[0])):
                 painter.save()
-                painter.translate()
-
-                # TODO draw some the pieces as ellipses
-                # TODO choose your colour and set the painter brush to the correct colour
+                painter.translate(col * self.squareWidth(), row * self.squareHeight())
+                # TODO draw some pieces as ellipses
+                # TODO choose your color and set the painter brush to the correct color
                 radius = (self.squareWidth() - 2) / 2
                 center = QPoint(radius, radius)
                 painter.drawEllipse(center, radius, radius)
