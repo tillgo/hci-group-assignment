@@ -8,8 +8,8 @@ class Board(QFrame):  # base the board on a QFrame widget
     clickLocationSignal = pyqtSignal(str)  # signal sent when there is a new click location
 
     # TODO set the board width and height to be square
-    boardWidth = 500  # board is 0 squares wide # TODO this needs updating
-    boardHeight = 500  #
+    boardWidth = 7  # board is 0 squares wide # TODO this needs updating
+    boardHeight = 7  #
     timerSpeed = 1000  # the timer updates every 1 second
     counter = 10  # the number the counter will count down from
 
@@ -38,11 +38,11 @@ class Board(QFrame):  # base the board on a QFrame widget
 
     def squareWidth(self):
         '''returns the width of one square in the board'''
-        return self.contentsRect().width() / self.boardWidth
+        return int(self.contentsRect().width() / self.boardWidth)
 
     def squareHeight(self):
         '''returns the height of one square of the board'''
-        return self.contentsRect().height() / self.boardHeight
+        return int(self.contentsRect().height() / self.boardHeight)
 
     def start(self):
         '''starts game'''
