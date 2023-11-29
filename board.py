@@ -1,6 +1,8 @@
 from PyQt6.QtWidgets import QFrame
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal
+from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QPoint
 from PyQt6.QtGui import QPainter, QColor, QBrush
+
+from piece import Piece
 
 
 class Board(QFrame):  # base the board on a QFrame widget
@@ -24,8 +26,8 @@ class Board(QFrame):  # base the board on a QFrame widget
         self.isStarted = False  # game is not currently started
         self.start()  # start the game which will start the timer
 
-        self.boardArray = []  # TODO - create a 2d int/Piece array to store the state of the game
-        # self.printBoardArray()    # TODO - uncomment this method after creating the array above
+        self.boardArray = [[Piece.NoPiece for _ in range(self.boardWidth)] for _ in range(self.boardHeight)] # TODO - create a 2d int/Piece array to store the state of the game
+        self.printBoardArray()    # TODO - uncomment this method after creating the array above
 
     def printBoardArray(self):
         '''prints the boardArray in an attractive way'''
@@ -65,6 +67,7 @@ class Board(QFrame):  # base the board on a QFrame widget
         painter = QPainter(self)
         self.drawBoardSquares(painter)
         self.drawPieces(painter)
+        painter.end()
 
     def mousePressEvent(self, event):
         '''this event is automatically called when the mouse is pressed'''
@@ -86,8 +89,8 @@ class Board(QFrame):  # base the board on a QFrame widget
         '''draw all the square on the board'''
         squareWidth = self.squareWidth()
         squareHeight = self.squareHeight()
-        for row in range(0, Board.boardHeight):
-            for col in range(0, Board.boardWidth):
+        for row in range(0, len(self.boardArray)-1):
+            for col in range(0, len(self.boardArray[0])-1):
                 painter.save()
                 painter.translate(col * squareWidth, row * squareHeight)
                 painter.setBrush(QBrush(QColor(255, 255, 255)))  # Set brush color
@@ -99,10 +102,10 @@ class Board(QFrame):  # base the board on a QFrame widget
         for row in range(0, len(self.boardArray)):
             for col in range(0, len(self.boardArray[0])):
                 painter.save()
-                painter.translate(col * self.squareWidth(), row * self.squareHeight())
+                painter.translate(col * self.squareWidth()-self.squareWidth()/2, row * self.squareHeight()-self.squareHeight()/2)
                 # TODO draw some pieces as ellipses
                 # TODO choose your color and set the painter brush to the correct color
-                radius = (self.squareWidth() - 2) / 2
+                radius = int((self.squareWidth() - 2) / 2)
                 center = QPoint(radius, radius)
                 painter.drawEllipse(center, radius, radius)
                 painter.restore()
