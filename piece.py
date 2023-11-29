@@ -1,4 +1,4 @@
-class Piece(object):
-    NoPiece = 0
-    White = 1
-    Black = 2
+class Piece:
+
+    def __init__(self, color):
+        self.color = color

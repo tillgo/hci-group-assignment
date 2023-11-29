@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QFrame
 from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QPoint
 from PyQt6.QtGui import QPainter, QColor, QBrush
 
-from piece import Piece
+from piececonfig import PieceConfig
 
 
 class Board(QFrame):  # base the board on a QFrame widget
@@ -26,7 +26,10 @@ class Board(QFrame):  # base the board on a QFrame widget
         self.isStarted = False  # game is not currently started
         self.start()  # start the game which will start the timer
 
-        self.boardArray = [[Piece.NoPiece for _ in range(self.boardWidth)] for _ in range(self.boardHeight)] # TODO - create a 2d int/Piece array to store the state of the game
+        self.boardArray = [[PieceConfig.NoPiece for _ in range(self.boardWidth)] for _ in range(self.boardHeight)] # TODO - create a 2d int/Piece array to store the state of the game
+        self.boardArray[3][3] = PieceConfig.White
+        self.boardArray[3][4] = PieceConfig.Black
+        self.boardArray[4][4] = PieceConfig.White
         self.printBoardArray()    # TODO - uncomment this method after creating the array above
 
     def printBoardArray(self):
@@ -38,13 +41,19 @@ class Board(QFrame):  # base the board on a QFrame widget
         '''convert the mouse click event to a row and column'''
         pass  # Implement this method according to your logic
 
-    def squareWidth(self):
-        '''returns the width of one square in the board'''
-        return int(self.contentsRect().width() / self.boardWidth)
+    def squareSize(self):
+        '''returns  the size (width and length of a square
+        The size is choosen by calculatin the maximum possible width and height and picking the smaller one,
+        so the quares are acutally squares and fit on the screen
+        '''
+        max_width =  int(self.contentsRect().width() / self.boardWidth)
+        max_height = int(self.contentsRect().height() / self.boardHeight)
+        if max_width < max_height:
+            return  max_width
 
-    def squareHeight(self):
-        '''returns the height of one square of the board'''
-        return int(self.contentsRect().height() / self.boardHeight)
+        return max_height
+
+
 
     def start(self):
         '''starts game'''
@@ -87,25 +96,28 @@ class Board(QFrame):  # base the board on a QFrame widget
 
     def drawBoardSquares(self, painter):
         '''draw all the square on the board'''
-        squareWidth = self.squareWidth()
-        squareHeight = self.squareHeight()
+        squareSize = self.squareSize()
         for row in range(0, len(self.boardArray)-1):
             for col in range(0, len(self.boardArray[0])-1):
                 painter.save()
-                painter.translate(col * squareWidth, row * squareHeight)
+                painter.translate(col * squareSize, row * squareSize)
                 painter.setBrush(QBrush(QColor(255, 255, 255)))  # Set brush color
-                painter.drawRect(0, 0, squareWidth, squareHeight)  # Draw rectangles
+                painter.drawRect(0, 0, squareSize, squareSize)  # Draw rectangles
                 painter.restore()
 
     def drawPieces(self, painter):
         '''draw the pieces on the board'''
         for row in range(0, len(self.boardArray)):
             for col in range(0, len(self.boardArray[0])):
-                painter.save()
-                painter.translate(col * self.squareWidth()-self.squareWidth()/2, row * self.squareHeight()-self.squareHeight()/2)
-                # TODO draw some pieces as ellipses
-                # TODO choose your color and set the painter brush to the correct color
-                radius = int((self.squareWidth() - 2) / 2)
-                center = QPoint(radius, radius)
-                painter.drawEllipse(center, radius, radius)
-                painter.restore()
+                piece = self.boardArray[row][col]
+                if piece.color:
+                    painter.save()
+                    painter.setBrush(QColor(piece.color))
+                    print(piece.color)
+                    painter.translate(col * self.squareSize(), row * self.squareSize())
+                    # TODO draw some pieces as ellipses
+                    # TODO choose your color and set the painter brush to the correct color
+                    radius = int((self.squareSize()) / 2)
+                    center = QPoint(0, 0)
+                    painter.drawEllipse(center, radius, radius)
+                    painter.restore()
