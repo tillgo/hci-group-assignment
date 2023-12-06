@@ -29,9 +29,7 @@ class Board(QFrame):  # base the board on a QFrame widget
         self.mouseHoverSignal.connect(self.repaint)
         # Enable Mouse Tracking
         self.setMouseTracking(True)
-        self.boardArray = []
         self.currentHoverField = None
-        self.initBoard()
 
         self.timer = QTimer(self)  # create a timer for the game
         self.timer.timeout.connect(self.timerEvent)  # connect timeout signal to timerEvent method
@@ -47,14 +45,8 @@ class Board(QFrame):  # base the board on a QFrame widget
         self.boardArray = [[PieceConfig.NoPiece for _ in range(self.boardWidth)] for _ in
                            range(self.boardHeight)]
         self.boardArray[3][3] = PieceConfig.White
-        self.boardArray[3][4] = PieceConfig.Black
+        self.boardArray[3][4] = PieceConfig.White
         self.boardArray[4][4] = PieceConfig.White
-        self.printBoardArray()  # TODO - uncomment this method after creating the array above
-
-    def printBoardArray(self):
-        '''prints the boardArray in an attractive way'''
-        print("boardArray:")
-        print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in self.boardArray]))
 
     def mousePosToColRow(self, event):
         """convert the mouse click event to a row and column"""
@@ -121,6 +113,7 @@ class Board(QFrame):  # base the board on a QFrame widget
         print(row)
         if row < len(self.boardArray) and col < len(self.boardArray[0]) and GameLogic.checkLegalMove(self.boardArray, Field(col, row)):
             self.boardArray[row][col] = PieceConfig.Black
+            GameLogic.try_captures(self.boardArray, PieceConfig.Black)
             self.clickLocationSignal.emit(clickLoc)
 
     def resetGame(self):
