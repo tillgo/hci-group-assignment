@@ -1,6 +1,6 @@
 import unittest
 
-from game_logic import GameLogic
+from rules import Rules
 from piececonfig import PieceConfig
 
 
@@ -12,7 +12,7 @@ class MyTestCase(unittest.TestCase):
             [PieceConfig.White, PieceConfig.Black, PieceConfig.White, PieceConfig.NoPiece],
             [PieceConfig.NoPiece, PieceConfig.White, PieceConfig.NoPiece, PieceConfig.NoPiece]
         ]
-        GameLogic.try_captures(test_board, PieceConfig.White)
+        Rules.try_captures(test_board, PieceConfig.White)
 
         result = [
             [PieceConfig.NoPiece, PieceConfig.NoPiece, PieceConfig.NoPiece, PieceConfig.NoPiece],
@@ -28,7 +28,7 @@ class MyTestCase(unittest.TestCase):
             [PieceConfig.White, PieceConfig.Black, PieceConfig.Black, PieceConfig.White],
             [PieceConfig.NoPiece, PieceConfig.White, PieceConfig.White, PieceConfig.NoPiece]
         ]
-        GameLogic.try_captures(test_board2, PieceConfig.White)
+        Rules.try_captures(test_board2, PieceConfig.White)
 
         result = [
             [PieceConfig.Black, PieceConfig.NoPiece, PieceConfig.White, PieceConfig.NoPiece],
@@ -44,7 +44,7 @@ class MyTestCase(unittest.TestCase):
             [PieceConfig.Black, PieceConfig.White, PieceConfig.White, PieceConfig.Black],
             [PieceConfig.NoPiece, PieceConfig.Black, PieceConfig.Black, PieceConfig.NoPiece]
         ]
-        GameLogic.try_captures(test_board3, PieceConfig.Black)
+        Rules.try_captures(test_board3, PieceConfig.Black)
 
         result = [
             [PieceConfig.Black, PieceConfig.NoPiece, PieceConfig.Black, PieceConfig.NoPiece],

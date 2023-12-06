@@ -1,6 +1,8 @@
 from PyQt6.QtWidgets import QDockWidget, QVBoxLayout, QWidget, QLabel
 from PyQt6.QtCore import pyqtSlot
 
+from field import Field
+
 
 class ScoreBoard(QDockWidget):
     """base the score_board on a QDockWidget"""
@@ -35,11 +37,11 @@ class ScoreBoard(QDockWidget):
         # when the updateTimerSignal is emitted in the board the setTimeRemaining slot receives it
         board.updateTimerSignal.connect(self.setTimeRemaining)
 
-    @pyqtSlot(str)  # checks to make sure that the following slot is receiving an argument of the type 'int'
-    def setClickLocation(self, clickLoc):
+    @pyqtSlot(Field)  # checks to make sure that the following slot is receiving an argument of the type 'int'
+    def setClickLocation(self, field):
         """updates the label to show the click location"""
-        self.label_clickLocation.setText("Click Location: " + clickLoc)
-        print('slot ' + clickLoc)
+        self.label_clickLocation.setText("Click Location: " + str(field))
+        print('slot ' + str(field))
 
     @pyqtSlot(int)
     def setTimeRemaining(self, timeRemaining):

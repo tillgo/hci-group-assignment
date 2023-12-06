@@ -1,4 +1,4 @@
 class Field:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+    def __init__(self, col, row):
+        self.col = col
+        self.row = row

@@ -1,20 +1,20 @@
-from piece import Piece
+from PieceColor import PieceColor
 from piececonfig import getOpposite, PieceConfig
 
 
-class GameLogic:
+class Rules:
 
     @staticmethod
     def checkLegalMove(boardArray, fieldToBePlaced):
         # ToDo check if Move was a suicide
-        return GameLogic.checkFieldUnoccupied(boardArray, fieldToBePlaced)
+        return Rules.checkFieldUnoccupied(boardArray, fieldToBePlaced)
 
     @staticmethod
     def checkFieldUnoccupied(boardArray, fieldToBePlaced):
-        return boardArray[fieldToBePlaced.y][fieldToBePlaced.x] is PieceConfig.NoPiece
+        return boardArray[fieldToBePlaced.row][fieldToBePlaced.col] is PieceConfig.NoPiece
 
     @staticmethod
-    def try_captures(boardArray: list[list[Piece]], placed: Piece):
+    def try_captures(boardArray: list[list[PieceColor]], placed: PieceColor):
         for rIdx, row in enumerate(boardArray):
             for cIdx, piece in enumerate(row):
                 if piece == placed or piece == PieceConfig.NoPiece:  # skip if empty or same color
@@ -22,14 +22,14 @@ class GameLogic:
 
                 # check the liberties and keep track of the connected stones
                 visited = set()
-                hasLiberties = GameLogic.find_liberties(boardArray, rIdx, cIdx, piece, visited)
+                hasLiberties = Rules.find_liberties(boardArray, rIdx, cIdx, piece, visited)
 
                 if not hasLiberties:
                     for r, c in visited:
                         boardArray[r][c] = PieceConfig.NoPiece
 
     @staticmethod
-    def find_liberties(boardArray: list[list[Piece]], row, col, piece: Piece, visited):
+    def find_liberties(boardArray: list[list[PieceColor]], row, col, piece: PieceColor, visited):
         """
         Recursively find liberties for a group of stones with the specified color.
 
@@ -61,7 +61,7 @@ class GameLogic:
 
             # liberties to True if any surrounding piece is empty or recursively check neighbour pieces
             liberties = (liberties or boardArray[next_row][next_col] == PieceConfig.NoPiece
-                         or GameLogic.find_liberties(boardArray, next_row, next_col, piece, visited))
+                         or Rules.find_liberties(boardArray, next_row, next_col, piece, visited))
 
         return liberties
 

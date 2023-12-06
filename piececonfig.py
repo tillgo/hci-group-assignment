@@ -1,7 +1,7 @@
-from piece import Piece
+from PieceColor import PieceColor
 
 
-def getOpposite(piece: Piece):
+def getOpposite(piece: PieceColor):
     if piece == PieceConfig.Black:
         return PieceConfig.White
     elif piece == PieceConfig.White:
@@ -10,6 +10,6 @@ def getOpposite(piece: Piece):
 
 
 class PieceConfig(object):
-    NoPiece = Piece(None)
-    White = Piece("#FFFFFF")
-    Black = Piece("#000000")
+    NoPiece = PieceColor(None)
+    White = PieceColor("#FFFFFF")
+    Black = PieceColor("#000000")

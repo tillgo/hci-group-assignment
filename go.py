@@ -2,6 +2,8 @@ from PyQt6.QtWidgets import QApplication, QMainWindow
 from PyQt6.QtCore import Qt
 
 from board import Board
+from piececonfig import PieceConfig
+from rules import Rules
 from score_board import ScoreBoard
 
 
@@ -9,7 +11,24 @@ class Go(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.boardSize = 7
+        self.boardArray = [[PieceConfig.NoPiece for _ in range(self.boardSize)] for _ in
+                           range(self.boardSize)]
+        self.currentPieceColor = PieceConfig.Black
+
         self.initUI()
+
+    def onBoardFieldClicked(self, field):
+        if Rules.checkLegalMove(self.boardArray, field):
+            self.boardArray[field.row][field.col] = self.currentPieceColor
+            Rules.try_captures(self.boardArray, self.currentPieceColor)
+            self.board.boardArray = self.boardArray
+            self.board.repaint()
+            self.currentPieceColor = PieceConfig.White if self.currentPieceColor is PieceConfig.Black \
+                else PieceConfig.Black
+            self.board.currentPieceColor = self.currentPieceColor
+
+
 
     def getBoard(self):
         return self.board
@@ -19,8 +38,8 @@ class Go(QMainWindow):
 
     def initUI(self):
         """Initiates application UI"""
-        self.board = Board(self)
-        self.board.setObjectName("go-board")
+        self.board = Board(self, self.boardArray, self.currentPieceColor)
+        self.board.subscribeToFieldClicked(self.onBoardFieldClicked)
         self.setCentralWidget(self.board)
 
         self.scoreBoard = ScoreBoard()

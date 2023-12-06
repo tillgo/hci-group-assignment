@@ -1,31 +1,27 @@
-import typing
-
-from PyQt6.QtWidgets import QFrame
-from PyQt6.QtCore import Qt, QTimer, pyqtSignal, QPoint
+from PyQt6.QtCore import QTimer, pyqtSignal, QPoint
 from PyQt6.QtGui import QPainter, QColor, QBrush, QPen
-from PyQt6.uic.properties import QtGui
+from PyQt6.QtWidgets import QFrame
 
 from field import Field
-from game_logic import GameLogic
-from piece import Piece
-from piececonfig import PieceConfig
+from rules import Rules
 
 
 class Board(QFrame):  # base the board on a QFrame widget
     updateTimerSignal = pyqtSignal(int)  # signal sent when the timer is updated
-    clickLocationSignal = pyqtSignal(str)  # signal sent when there is a new click location
+    clickLocationSignal = pyqtSignal(Field)  # signal sent when there is a new click location
     mouseHoverSignal = pyqtSignal()  # signal sent when mouse is hovering over a field of the board
 
     illegalMoveColor = "#F32013"
 
-    boardWidth = 7  # board is 7 squares wide
-    boardHeight = 7  # board is 7 squares high
     timerSpeed = 1000  # the timer updates every 1 second
     counter = 10  # the number the counter will count down from
 
-    def __init__(self, parent):
+    def __init__(self, parent, boardArray, currentPieceColor):
         super().__init__(parent)
-        self.clickLocationSignal.connect(self.repaint)
+        self.boardArray = boardArray
+        self.currentPieceColor = currentPieceColor
+
+        self.boardSize = len(boardArray)
         self.mouseHoverSignal.connect(self.repaint)
         # Enable Mouse Tracking
         self.setMouseTracking(True)
@@ -34,7 +30,6 @@ class Board(QFrame):  # base the board on a QFrame widget
         self.timer = QTimer(self)  # create a timer for the game
         self.timer.timeout.connect(self.timerEvent)  # connect timeout signal to timerEvent method
         self.isStarted = False  # game is not currently started
-        self.boardArray: list[list[Piece]] = [[]]  # state of the board
 
         self.initBoard()
 
@@ -42,23 +37,26 @@ class Board(QFrame):  # base the board on a QFrame widget
         """initiates board"""
         self.start()  # start the game which will start the timer
 
-        self.boardArray = [[PieceConfig.NoPiece for _ in range(self.boardWidth)] for _ in
-                           range(self.boardHeight)]
-        self.boardArray[3][3] = PieceConfig.White
-        self.boardArray[3][4] = PieceConfig.White
-        self.boardArray[4][4] = PieceConfig.White
+    def subscribeToFieldClicked(self, func):
+        """
+        Subscribe to the signal, triggered if a field on the board is clicked.
+        :param func: function to be called, if signal was triggerd. takes a Field as parameter
+        """
+        self.clickLocationSignal.connect(func)
 
     def mousePosToColRow(self, event):
         """convert the mouse click event to a row and column"""
-        pass  # Implement this method according to your logic
+        col = round((event.position().x() - self.squareSize() / 2) / self.squareSize())
+        row = round((event.position().y() - self.squareSize() / 2) / self.squareSize())
+        return Field(col, row)
 
     def squareSize(self):
         """returns  the size (width and length of a square
         The size is chosen by calculating the maximum possible width and height and picking the smaller one,
         so the squares are actually squares and fit on the screen
         """
-        max_width = int(self.contentsRect().width() / self.boardWidth)
-        max_height = int(self.contentsRect().height() / self.boardHeight)
+        max_width = int(self.contentsRect().width() / self.boardSize)
+        max_height = int(self.contentsRect().height() / self.boardSize)
         return min(max_height, max_width)
 
     def pieceRadius(self):
@@ -81,18 +79,21 @@ class Board(QFrame):  # base the board on a QFrame widget
         self.updateTimerSignal[int].emit(self.counter)
 
     def paintEvent(self, event):
-        """paints the board and the pieces of the game"""
         painter = QPainter(self)
-        self.drawBoardSquares(painter)
-        self.drawPieces(painter)
-        self.drawHoverSymbol(painter)
+        self.updateBoard(self.boardArray, painter)
         painter.end()
+
+    def updateBoard(self, boardArray, painter):
+        """paints the board and the pieces of the game"""
+        self.drawBoardSquares(painter)
+        self.drawPieces(painter, boardArray)
+        self.drawHoverSymbol(painter)
 
     def mouseMoveEvent(self, event):
         col = round((event.position().x() - self.squareSize() / 2) / self.squareSize())
         row = round((event.position().y() - self.squareSize() / 2) / self.squareSize())
 
-        if row < len(self.boardArray) and col < len(self.boardArray[0]):
+        if row < self.boardSize and col < self.boardSize:
             self.currentHoverField = Field(col, row)
         else:
             self.currentHoverField = None
@@ -105,37 +106,27 @@ class Board(QFrame):  # base the board on a QFrame widget
             event.position().y()) + "]"  # the location where a mouse click was registered
         print("mousePressEvent() - " + clickLoc)
         # TODO you could call some game logic here
-        col = round((event.position().x() - self.squareSize() / 2) / self.squareSize())
-        row = round((event.position().y() - self.squareSize() / 2) / self.squareSize())
-        print("locations")
-        print(self.squareSize())
-        print(col)
-        print(row)
-        if row < len(self.boardArray) and col < len(self.boardArray[0]) and GameLogic.checkLegalMove(self.boardArray, Field(col, row)):
-            self.boardArray[row][col] = PieceConfig.Black
-            GameLogic.try_captures(self.boardArray, PieceConfig.Black)
-            self.clickLocationSignal.emit(clickLoc)
+        field = self.mousePosToColRow(event)
+        if field.row < self.boardSize and field.col < self.boardSize:
+            self.clickLocationSignal.emit(field)
 
     def resetGame(self):
         """clears pieces from the board"""
         # TODO write code to reset game
 
-    def tryMove(self, newX, newY):
-        """tries to move a piece"""
-        pass  # Implement this method according to your logic
-
     def drawBoardSquares(self, painter):
         """draw all the square on the board"""
         squareSize = self.squareSize()
-        for row in range(0, len(self.boardArray) - 1):
-            for col in range(0, len(self.boardArray[0]) - 1):
+        for row in range(0, self.boardSize - 1):
+            for col in range(0, self.boardSize - 1):
                 painter.save()
                 painter.translate(col * squareSize + squareSize / 2, row * squareSize + squareSize / 2)
                 painter.setBrush(QBrush(QColor(255, 255, 255)))  # Set brush color
                 painter.drawRect(0, 0, squareSize, squareSize)  # Draw rectangles
                 painter.restore()
 
-    def drawPieces(self, painter):
+    def drawPieces(self, painter, boardArray):
+        self.boardArray = boardArray
         """draw the pieces on the board"""
         for row in range(0, len(self.boardArray)):
             for col in range(0, len(self.boardArray[0])):
@@ -155,12 +146,12 @@ class Board(QFrame):  # base the board on a QFrame widget
     def drawHoverSymbol(self, painter):
         if self.currentHoverField:
             painter.save()
-            painter.translate(self.currentHoverField.x * self.squareSize() + self.squareSize() / 2,
-                              self.currentHoverField.y * self.squareSize() + self.squareSize() / 2)
+            painter.translate(self.currentHoverField.col * self.squareSize() + self.squareSize() / 2,
+                              self.currentHoverField.row * self.squareSize() + self.squareSize() / 2)
 
-            isLegalMove = GameLogic.checkLegalMove(self.boardArray, self.currentHoverField)
+            isLegalMove = Rules.checkLegalMove(self.boardArray, self.currentHoverField)
             if isLegalMove:
-                # ToDo Set here the brush color to the color whose turn it currently is
+                painter.setBrush(QColor(self.currentPieceColor.color))
                 radius = self.pieceRadius()
                 center = QPoint(0, 0)
                 painter.drawEllipse(center, radius, radius)
