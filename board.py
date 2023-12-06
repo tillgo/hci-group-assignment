@@ -115,7 +115,7 @@ class Board(QFrame):  # base the board on a QFrame widget
         print(self.squareSize())
         print(col)
         print(row)
-        if GameLogic.checkLegalMove(self.boardArray, Field(col, row)):
+        if row < len(self.boardArray) and col < len(self.boardArray[0]) and GameLogic.checkLegalMove(self.boardArray, Field(col, row)):
             self.boardArray[row][col] = PieceConfig.Black
             self.clickLocationSignal.emit(clickLoc)
 
