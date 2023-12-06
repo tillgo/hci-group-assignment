@@ -7,6 +7,7 @@ from PyQt6.uic.properties import QtGui
 
 from field import Field
 from game_logic import GameLogic
+from piece import Piece
 from piececonfig import PieceConfig
 
 
@@ -17,9 +18,8 @@ class Board(QFrame):  # base the board on a QFrame widget
 
     illegalMoveColor = "#F32013"
 
-    # TODO set the board width and height to be square
-    boardWidth = 7  # board is 0 squares wide # TODO this needs updating
-    boardHeight = 7  #
+    boardWidth = 7  # board is 7 squares wide
+    boardHeight = 7  # board is 7 squares high
     timerSpeed = 1000  # the timer updates every 1 second
     counter = 10  # the number the counter will count down from
 
@@ -33,15 +33,19 @@ class Board(QFrame):  # base the board on a QFrame widget
         self.currentHoverField = None
         self.initBoard()
 
-    def initBoard(self):
-        '''initiates board'''
         self.timer = QTimer(self)  # create a timer for the game
         self.timer.timeout.connect(self.timerEvent)  # connect timeout signal to timerEvent method
         self.isStarted = False  # game is not currently started
+        self.boardArray: list[list[Piece]] = [[]]  # state of the board
+
+        self.initBoard()
+
+    def initBoard(self):
+        """initiates board"""
         self.start()  # start the game which will start the timer
 
         self.boardArray = [[PieceConfig.NoPiece for _ in range(self.boardWidth)] for _ in
-                           range(self.boardHeight)]  # TODO - create a 2d int/Piece array to store the state of the game
+                           range(self.boardHeight)]
         self.boardArray[3][3] = PieceConfig.White
         self.boardArray[3][4] = PieceConfig.Black
         self.boardArray[4][4] = PieceConfig.White
@@ -53,14 +57,14 @@ class Board(QFrame):  # base the board on a QFrame widget
         print('\n'.join(['\t'.join([str(cell) for cell in row]) for row in self.boardArray]))
 
     def mousePosToColRow(self, event):
-        '''convert the mouse click event to a row and column'''
+        """convert the mouse click event to a row and column"""
         pass  # Implement this method according to your logic
 
     def squareSize(self):
-        '''returns  the size (width and length of a square
-        The size is choosen by calculatin the maximum possible width and height and picking the smaller one,
-        so the quares are acutally squares and fit on the screen
-        '''
+        """returns  the size (width and length of a square
+        The size is chosen by calculating the maximum possible width and height and picking the smaller one,
+        so the squares are actually squares and fit on the screen
+        """
         max_width = int(self.contentsRect().width() / self.boardWidth)
         max_height = int(self.contentsRect().height() / self.boardHeight)
         return min(max_height, max_width)
@@ -69,23 +73,23 @@ class Board(QFrame):  # base the board on a QFrame widget
         return int(self.squareSize() / 2 - 20)
 
     def start(self):
-        '''starts game'''
+        """starts game"""
         self.isStarted = True  # set the boolean which determines if the game has started to TRUE
         self.resetGame()  # reset the game
         self.timer.start(self.timerSpeed)  # start the timer with the correct speed
         print("start () - timer is started")
 
     def timerEvent(self):
-        '''this event is automatically called when the timer is updated. based on the timerSpeed variable '''
+        """this event is automatically called when the timer is updated. based on the timerSpeed variable """
         # TODO adapt this code to handle your timers
         if Board.counter == 0:
             print("Game over")
         self.counter -= 1
         print('timerEvent()', self.counter)
-        self.updateTimerSignal.emit(self.counter)
+        self.updateTimerSignal[int].emit(self.counter)
 
     def paintEvent(self, event):
-        '''paints the board and the pieces of the game'''
+        """paints the board and the pieces of the game"""
         painter = QPainter(self)
         self.drawBoardSquares(painter)
         self.drawPieces(painter)
@@ -104,7 +108,7 @@ class Board(QFrame):  # base the board on a QFrame widget
         self.mouseHoverSignal.emit()
 
     def mousePressEvent(self, event):
-        '''this event is automatically called when the mouse is pressed'''
+        """this event is automatically called when the mouse is pressed"""
         clickLoc = "click location [" + str(event.position().x()) + "," + str(
             event.position().y()) + "]"  # the location where a mouse click was registered
         print("mousePressEvent() - " + clickLoc)
@@ -120,15 +124,15 @@ class Board(QFrame):  # base the board on a QFrame widget
             self.clickLocationSignal.emit(clickLoc)
 
     def resetGame(self):
-        '''clears pieces from the board'''
+        """clears pieces from the board"""
         # TODO write code to reset game
 
     def tryMove(self, newX, newY):
-        '''tries to move a piece'''
+        """tries to move a piece"""
         pass  # Implement this method according to your logic
 
     def drawBoardSquares(self, painter):
-        '''draw all the square on the board'''
+        """draw all the square on the board"""
         squareSize = self.squareSize()
         for row in range(0, len(self.boardArray) - 1):
             for col in range(0, len(self.boardArray[0]) - 1):
@@ -139,14 +143,13 @@ class Board(QFrame):  # base the board on a QFrame widget
                 painter.restore()
 
     def drawPieces(self, painter):
-        '''draw the pieces on the board'''
+        """draw the pieces on the board"""
         for row in range(0, len(self.boardArray)):
             for col in range(0, len(self.boardArray[0])):
                 piece = self.boardArray[row][col]
                 if piece.color:
                     painter.save()
                     painter.setBrush(QColor(piece.color))
-                    print(piece.color)
                     painter.translate(col * self.squareSize() + self.squareSize() / 2,
                                       row * self.squareSize() + self.squareSize() / 2)
                     # TODO draw some pieces as ellipses

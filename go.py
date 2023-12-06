@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QApplication, QMainWindow, QDockWidget
+from PyQt6.QtWidgets import QApplication, QMainWindow
 from PyQt6.QtCore import Qt
 
 from board import Board
@@ -21,7 +21,7 @@ class Go(QMainWindow):
 
 
 
-        '''Initiates application UI'''
+        """Initiates application UI"""
         self.board = Board(self)
         self.board.setObjectName("go-board")
         self.setCentralWidget(self.board)
@@ -35,16 +35,10 @@ class Go(QMainWindow):
         self.setWindowTitle('Go')
         self.show()
 
-
     def center(self):
-        '''Centers the window on the screen'''
+        """Centers the window on the screen"""
         screen = QApplication.primaryScreen().availableGeometry()
         size = self.geometry()
         x = (screen.width() - size.width()) // 2
         y = (screen.height() - size.height()) // 2
         self.move(x, y)
-
-
-
-
-
