@@ -17,6 +17,7 @@ class ScoreBoard(QDockWidget):
         # create a widget to hold other widgets
         self.mainWidget = QWidget()
         self.mainLayout = QVBoxLayout()
+        self.setFixedWidth(150)
 
         # create two labels which will be updated by signals
         self.label_clickLocation = QLabel("Click Location: ")

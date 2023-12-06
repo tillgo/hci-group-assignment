@@ -18,8 +18,12 @@ class Go(QMainWindow):
         return self.scoreBoard
 
     def initUI(self):
+
+
+
         '''Initiates application UI'''
         self.board = Board(self)
+        self.board.setObjectName("go-board")
         self.setCentralWidget(self.board)
 
         self.scoreBoard = ScoreBoard()
