@@ -21,7 +21,7 @@ class Go(QMainWindow):
     def onBoardFieldClicked(self, field):
         if Rules.checkLegalMove(self.boardArray, field):
             self.boardArray[field.row][field.col] = self.currentPieceColor
-            Rules.try_captures(self.boardArray, self.currentPieceColor)
+            amountCaptured = Rules.try_captures(self.boardArray, self.currentPieceColor)
             self.board.boardArray = self.boardArray
             self.board.repaint()
             self.currentPieceColor = PieceConfig.White if self.currentPieceColor is PieceConfig.Black \

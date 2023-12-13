@@ -14,7 +14,8 @@ class Rules:
         return boardArray[fieldToBePlaced.row][fieldToBePlaced.col] is PieceConfig.NoPiece
 
     @staticmethod
-    def try_captures(boardArray: list[list[PieceColor]], placed: PieceColor):
+    def try_captures(boardArray: list[list[PieceColor]], placed: PieceColor) -> int:
+        capturedCount = 0
         for rIdx, row in enumerate(boardArray):
             for cIdx, piece in enumerate(row):
                 if piece == placed or piece == PieceConfig.NoPiece:  # skip if empty or same color
@@ -26,7 +27,10 @@ class Rules:
 
                 if not hasLiberties:
                     for r, c in visited:
+                        capturedCount += 1
                         boardArray[r][c] = PieceConfig.NoPiece
+
+        return capturedCount
 
     @staticmethod
     def find_liberties(boardArray: list[list[PieceColor]], row, col, piece: PieceColor, visited):
