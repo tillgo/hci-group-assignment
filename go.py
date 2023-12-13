@@ -11,18 +11,22 @@ class Go(QMainWindow):
 
     def __init__(self):
         super().__init__()
+        self.gameHistory = []
         self.boardSize = 7
-        self.boardArray = [[PieceConfig.NoPiece for _ in range(self.boardSize)] for _ in
-                           range(self.boardSize)]
+        self.gameHistory.append([[PieceConfig.NoPiece for _ in range(self.boardSize)] for _ in
+                           range(self.boardSize)])
         self.currentPieceColor = PieceConfig.Black
 
         self.initUI()
 
     def onBoardFieldClicked(self, field):
-        if Rules.checkLegalMove(self.boardArray, field):
-            self.boardArray[field.row][field.col] = self.currentPieceColor
-            Rules.try_captures(self.boardArray, self.currentPieceColor)
-            self.board.boardArray = self.boardArray
+        currentBoardArray = self.gameHistory[-1]
+        if Rules.checkLegalMove(currentBoardArray, field):
+            newBoardArray = currentBoardArray.copy()
+            newBoardArray[field.row][field.col] = self.currentPieceColor
+            Rules.try_captures(newBoardArray, self.currentPieceColor)
+            self.gameHistory.append(newBoardArray)
+            self.board.boardArray = newBoardArray
             self.board.repaint()
             self.currentPieceColor = PieceConfig.White if self.currentPieceColor is PieceConfig.Black \
                 else PieceConfig.Black
@@ -38,7 +42,7 @@ class Go(QMainWindow):
 
     def initUI(self):
         """Initiates application UI"""
-        self.board = Board(self, self.boardArray, self.currentPieceColor)
+        self.board = Board(self, self.gameHistory[-1], self.currentPieceColor)
         self.board.subscribeToFieldClicked(self.onBoardFieldClicked)
         self.setCentralWidget(self.board)
 
