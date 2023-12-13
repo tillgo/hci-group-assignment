@@ -13,3 +13,6 @@ class PieceConfig(object):
     NoPiece = PieceColor(None)
     White = PieceColor("#FFFFFF")
     Black = PieceColor("#000000")
+
+
+

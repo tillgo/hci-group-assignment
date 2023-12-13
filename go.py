@@ -2,7 +2,8 @@ from PyQt6.QtWidgets import QApplication, QMainWindow
 from PyQt6.QtCore import Qt
 
 from board import Board
-from piececonfig import PieceConfig
+from game_state import GameState
+from piececonfig import PieceConfig, getOpposite
 from rules import Rules
 from score_board import ScoreBoard
 
@@ -13,19 +14,23 @@ class Go(QMainWindow):
         super().__init__()
         self.gameHistory = []
         self.boardSize = 7
-        self.gameHistory.append([[PieceConfig.NoPiece for _ in range(self.boardSize)] for _ in
-                                 range(self.boardSize)])
         self.currentPieceColor = PieceConfig.Black
+        gameState = GameState(None, [[PieceConfig.NoPiece for _ in range(self.boardSize)] for _ in
+                                 range(self.boardSize)], {PieceConfig.Black: 0, PieceConfig.White: 0}, False)
+        self.gameHistory.append(gameState)
+
 
         self.initUI()
 
     def onBoardFieldClicked(self, field):
-        currentBoardArray = self.gameHistory[-1]
-        if Rules.checkLegalMove(currentBoardArray, field):
-            newBoardArray = currentBoardArray.copy()
+        currentGameState = self.gameHistory[-1]
+        if Rules.checkLegalMove(currentGameState.boardArray, field):
+            newBoardArray = currentGameState.boardArray.copy()
             newBoardArray[field.row][field.col] = self.currentPieceColor
             amountCaptured = Rules.try_captures(newBoardArray, self.currentPieceColor)
-            self.gameHistory.append(newBoardArray)
+            newPrisoners = currentGameState.prisoners.copy()
+            newPrisoners[getOpposite(self.currentPieceColor)] = newPrisoners[getOpposite(self.currentPieceColor)] + amountCaptured
+            self.gameHistory.append(GameState(self.currentPieceColor, newBoardArray, newPrisoners, False))
             self.board.boardArray = newBoardArray
             self.board.repaint()
             self.currentPieceColor = PieceConfig.White if self.currentPieceColor is PieceConfig.Black \
@@ -40,7 +45,7 @@ class Go(QMainWindow):
 
     def initUI(self):
         """Initiates application UI"""
-        self.board = Board(self, self.boardArray, self.currentPieceColor)
+        self.board = Board(self, self.gameHistory[-1].boardArray ,self.currentPieceColor)
         self.board.subscribeToFieldClicked(self.onBoardFieldClicked)
         self.setCentralWidget(self.board)
 
