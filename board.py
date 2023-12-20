@@ -16,10 +16,11 @@ class Board(QFrame):  # base the board on a QFrame widget
     timerSpeed = 1000  # the timer updates every 1 second
     counter = 10  # the number the counter will count down from
 
-    def __init__(self, parent, boardArray, currentPieceColor):
+    def __init__(self, parent, boardArray, currentPieceColor, checkLegalMove):
         super().__init__(parent)
         self.boardArray = boardArray
         self.currentPieceColor = currentPieceColor
+        self.checkLegalMove = checkLegalMove
 
         self.boardSize = len(boardArray)
         self.mouseHoverSignal.connect(self.repaint)
@@ -149,7 +150,7 @@ class Board(QFrame):  # base the board on a QFrame widget
             painter.translate(self.currentHoverField.col * self.squareSize() + self.squareSize() / 2,
                               self.currentHoverField.row * self.squareSize() + self.squareSize() / 2)
 
-            isLegalMove = Rules.checkLegalMove(self.boardArray, self.currentHoverField, self.currentPieceColor)
+            isLegalMove = self.checkLegalMove(self.currentHoverField)
             if isLegalMove:
                 painter.setBrush(QColor(self.currentPieceColor.color))
                 radius = self.pieceRadius()

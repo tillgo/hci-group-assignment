@@ -1,7 +1,11 @@
+import copy
+
 from PyQt6.QtWidgets import QDockWidget, QVBoxLayout, QWidget, QLabel
 from PyQt6.QtCore import pyqtSlot
 
 from field import Field
+from piececonfig import PieceConfig
+from utils import Utils
 
 
 class ScoreBoard(QDockWidget):
@@ -50,3 +54,10 @@ class ScoreBoard(QDockWidget):
         self.label_timeRemaining.setText(update)
         print('slot ' + str(timeRemaining))
         # self.redraw()
+
+
+if __name__ == '__main__':
+    list1 = [[PieceConfig.Black], [PieceConfig.Black]]
+    list2 = copy.deepcopy(list1)
+
+    print(list1 == list2)

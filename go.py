@@ -24,8 +24,8 @@ class Go(QMainWindow):
 
     def onBoardFieldClicked(self, field):
         currentGameState = self.gameHistory[-1]
-        if Rules.checkLegalMove(currentGameState.boardArray, field, self.currentPieceColor):
-            newBoardArray = currentGameState.boardArray.copy()
+        if Rules.checkLegalMove(self.gameHistory, currentGameState.boardArray, field, self.currentPieceColor):
+            newBoardArray = [i.copy() for i in currentGameState.boardArray]
             newBoardArray[field.row][field.col] = self.currentPieceColor
             amountCaptured = Rules.try_captures(newBoardArray, self.currentPieceColor)
             newPrisoners = currentGameState.prisoners.copy()
@@ -37,6 +37,9 @@ class Go(QMainWindow):
                 else PieceConfig.Black
             self.board.currentPieceColor = self.currentPieceColor
 
+    def onBoardHoverCheckLegalMove(self, field):
+        return Rules.checkLegalMove(self.gameHistory, self.gameHistory[-1].boardArray, field, self.currentPieceColor)
+
     def getBoard(self):
         return self.board
 
@@ -45,7 +48,7 @@ class Go(QMainWindow):
 
     def initUI(self):
         """Initiates application UI"""
-        self.board = Board(self, self.gameHistory[-1].boardArray ,self.currentPieceColor)
+        self.board = Board(self, self.gameHistory[-1].boardArray ,self.currentPieceColor, self.onBoardHoverCheckLegalMove)
         self.board.subscribeToFieldClicked(self.onBoardFieldClicked)
         self.setCentralWidget(self.board)
 

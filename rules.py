@@ -2,15 +2,18 @@ import copy
 
 from PieceColor import PieceColor
 from field import Field
+from game_state import GameState
 from piececonfig import getOpposite, PieceConfig
 
 
 class Rules:
 
     @staticmethod
-    def checkLegalMove(boardArray: list[list[PieceColor]], fieldToBePlaced: Field, colorToBePlaced: PieceColor) -> bool:
+    def checkLegalMove(gameHistory: list[GameState] ,boardArray: list[list[PieceColor]], fieldToBePlaced: Field, colorToBePlaced: PieceColor) -> bool:
         # ToDo check if Move was move
-        return Rules.checkFieldUnoccupied(boardArray, fieldToBePlaced) and not Rules.checkSuicideMove(boardArray, fieldToBePlaced, colorToBePlaced)
+        return (Rules.checkFieldUnoccupied(boardArray, fieldToBePlaced)
+                and not Rules.checkSuicideMove(boardArray, fieldToBePlaced, colorToBePlaced)
+                and Rules.checkKoRule(gameHistory, fieldToBePlaced, colorToBePlaced))
 
     @staticmethod
     def checkFieldUnoccupied(boardArray: list[list[PieceColor]], fieldToBePlaced: Field) -> bool:
@@ -37,6 +40,26 @@ class Rules:
         isFiledSourroundedByEnemy = fieldToBePlaced.isFieldSurroundedByEnemy(boardArray, getOpposite(colorToBePlaced))
 
         return isFiledSourroundedByEnemy and not isCaptureMade
+
+    @staticmethod
+    def checkKoRule(gameHistory: list[GameState], fieldToBePlaced: Field, colorToBePlaced: PieceColor) -> bool:
+        """
+        Checks if Ko-Rule is satisfied
+        parameters:
+            - gameHistory: list with all previous game states of the Go Board
+            - fieldToBePlaced: field on which a stone should be placed
+            - colorToBePlaced: Color which is tried to be placed
+        """
+        if len(gameHistory) < 2:
+            return True
+
+        currentBoardState = gameHistory[-1].boardArray
+        nextBoardState = copy.deepcopy(currentBoardState)
+        nextBoardState[fieldToBePlaced.row][fieldToBePlaced.col] = colorToBePlaced
+        Rules.try_captures(nextBoardState, colorToBePlaced)
+
+        return nextBoardState != gameHistory[-2].boardArray
+
 
 
     @staticmethod
