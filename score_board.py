@@ -5,7 +5,7 @@ from PyQt6.QtCore import pyqtSlot
 
 from field import Field
 from piececonfig import PieceConfig
-from utils import Utils
+
 
 
 class ScoreBoard(QDockWidget):

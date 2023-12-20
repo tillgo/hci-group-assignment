@@ -9,7 +9,8 @@ from piececonfig import getOpposite, PieceConfig
 class Rules:
 
     @staticmethod
-    def checkLegalMove(gameHistory: list[GameState] ,boardArray: list[list[PieceColor]], fieldToBePlaced: Field, colorToBePlaced: PieceColor) -> bool:
+    def checkLegalMove(gameHistory: list[GameState], boardArray: list[list[PieceColor]], fieldToBePlaced: Field,
+                       colorToBePlaced: PieceColor) -> bool:
         # ToDo check if Move was move
         return (Rules.checkFieldUnoccupied(boardArray, fieldToBePlaced)
                 and not Rules.checkSuicideMove(boardArray, fieldToBePlaced, colorToBePlaced)
@@ -20,7 +21,8 @@ class Rules:
         return boardArray[fieldToBePlaced.row][fieldToBePlaced.col] is PieceConfig.NoPiece
 
     @staticmethod
-    def checkSuicideMove(boardArray: list[list[PieceColor]], fieldToBePlaced: Field, colorToBePlaced: PieceColor) -> bool:
+    def checkSuicideMove(boardArray: list[list[PieceColor]], fieldToBePlaced: Field,
+                         colorToBePlaced: PieceColor) -> bool:
         """
         check, if move would be a suicide move
 
@@ -59,8 +61,6 @@ class Rules:
         Rules.try_captures(nextBoardState, colorToBePlaced)
 
         return nextBoardState != gameHistory[-2].boardArray
-
-
 
     @staticmethod
     def try_captures(boardArray: list[list[PieceColor]], placed: PieceColor) -> int:
@@ -117,4 +117,3 @@ class Rules:
                          or Rules.find_liberties(boardArray, next_row, next_col, piece, visited))
 
         return liberties
-
