@@ -1,17 +1,43 @@
+import copy
+
 from PieceColor import PieceColor
+from field import Field
 from piececonfig import getOpposite, PieceConfig
 
 
 class Rules:
 
     @staticmethod
-    def checkLegalMove(boardArray, fieldToBePlaced):
-        # ToDo check if Move was a suicide
-        return Rules.checkFieldUnoccupied(boardArray, fieldToBePlaced)
+    def checkLegalMove(boardArray: list[list[PieceColor]], fieldToBePlaced: Field, colorToBePlaced: PieceColor) -> bool:
+        # ToDo check if Move was move
+        return Rules.checkFieldUnoccupied(boardArray, fieldToBePlaced) and not Rules.checkSuicideMove(boardArray, fieldToBePlaced, colorToBePlaced)
 
     @staticmethod
-    def checkFieldUnoccupied(boardArray, fieldToBePlaced):
+    def checkFieldUnoccupied(boardArray: list[list[PieceColor]], fieldToBePlaced: Field) -> bool:
         return boardArray[fieldToBePlaced.row][fieldToBePlaced.col] is PieceConfig.NoPiece
+
+    @staticmethod
+    def checkSuicideMove(boardArray: list[list[PieceColor]], fieldToBePlaced: Field, colorToBePlaced: PieceColor) -> bool:
+        """
+        check, if move would be a suicide move
+
+        parameters:
+            - boardArray: 2D array representing the Go Board
+            - fieldToBePlaced: field on which a stone should be placed
+            - colorToBePlaced: Color which is tried to be placed
+
+        returns:
+            - boolean: - True if Suicide Move
+                       - False if no Suicide Move
+        """
+        boardCopy = copy.deepcopy(boardArray)
+        boardCopy[fieldToBePlaced.row][fieldToBePlaced.col] = colorToBePlaced
+
+        isCaptureMade = Rules.try_captures(boardCopy, colorToBePlaced) > 0
+        isFiledSourroundedByEnemy = fieldToBePlaced.isFieldSurroundedByEnemy(boardArray, getOpposite(colorToBePlaced))
+
+        return isFiledSourroundedByEnemy and not isCaptureMade
+
 
     @staticmethod
     def try_captures(boardArray: list[list[PieceColor]], placed: PieceColor) -> int:

@@ -149,7 +149,7 @@ class Board(QFrame):  # base the board on a QFrame widget
             painter.translate(self.currentHoverField.col * self.squareSize() + self.squareSize() / 2,
                               self.currentHoverField.row * self.squareSize() + self.squareSize() / 2)
 
-            isLegalMove = Rules.checkLegalMove(self.boardArray, self.currentHoverField)
+            isLegalMove = Rules.checkLegalMove(self.boardArray, self.currentHoverField, self.currentPieceColor)
             if isLegalMove:
                 painter.setBrush(QColor(self.currentPieceColor.color))
                 radius = self.pieceRadius()

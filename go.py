@@ -24,7 +24,7 @@ class Go(QMainWindow):
 
     def onBoardFieldClicked(self, field):
         currentGameState = self.gameHistory[-1]
-        if Rules.checkLegalMove(currentGameState.boardArray, field):
+        if Rules.checkLegalMove(currentGameState.boardArray, field, self.currentPieceColor):
             newBoardArray = currentGameState.boardArray.copy()
             newBoardArray[field.row][field.col] = self.currentPieceColor
             amountCaptured = Rules.try_captures(newBoardArray, self.currentPieceColor)
