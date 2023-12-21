@@ -1,5 +1,5 @@
-from PyQt6.QtCore import QTimer, pyqtSignal, QPoint
-from PyQt6.QtGui import QPainter, QColor, QBrush, QPen
+from PyQt6.QtCore import QTimer, pyqtSignal, QPoint, Qt
+from PyQt6.QtGui import QPainter, QColor, QBrush, QPen, QPalette, QPixmap, QImage
 from PyQt6.QtWidgets import QFrame
 
 from field import Field
@@ -32,11 +32,18 @@ class Board(QFrame):  # base the board on a QFrame widget
         self.timer.timeout.connect(self.timerEvent)  # connect timeout signal to timerEvent method
         self.isStarted = False  # game is not currently started
 
+        backgroundTexturePath = "./assets/goboard_background.jpg"
+        self.setBackgroundTexture(backgroundTexturePath)
+
         self.initBoard()
 
     def initBoard(self):
         """initiates board"""
         self.start()  # start the game which will start the timer
+
+    def setBackgroundTexture(self, image_path):
+        self.setFrameShape(QFrame.Shape.StyledPanel)
+        self.setStyleSheet("background-image: url({})".format(image_path))
 
     def subscribeToFieldClicked(self, func):
         """
@@ -122,7 +129,7 @@ class Board(QFrame):  # base the board on a QFrame widget
             for col in range(0, self.boardSize - 1):
                 painter.save()
                 painter.translate(col * squareSize + squareSize / 2, row * squareSize + squareSize / 2)
-                painter.setBrush(QBrush(QColor(255, 255, 255)))  # Set brush color
+                painter.setBrush(QBrush(QColor(0, 0, 0, 0)))  # Set brush color
                 painter.drawRect(0, 0, squareSize, squareSize)  # Draw rectangles
                 painter.restore()
 
