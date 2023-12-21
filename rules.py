@@ -1,5 +1,5 @@
 from PieceColor import PieceColor
-from piececonfig import getOpposite, PieceConfig
+from piececonfig import PieceConfig
 
 
 class Rules:
@@ -29,7 +29,6 @@ class Rules:
                     for r, c in visited:
                         capturedCount += 1
                         boardArray[r][c] = PieceConfig.NoPiece
-
         return capturedCount
 
     @staticmethod
@@ -68,4 +67,55 @@ class Rules:
                          or Rules.find_liberties(boardArray, next_row, next_col, piece, visited))
 
         return liberties
+
+    @staticmethod
+    def calculate_territories(boardArray: list[list[PieceColor]]) -> list[int, int]:
+        checked = set()
+        territories = [0, 0]
+        for rIdx, row in enumerate(boardArray):
+            for cIdx, piece in enumerate(row):
+                if piece != PieceConfig.NoPiece or (rIdx, cIdx) in checked:  # skip if not empty or same color
+                    continue
+
+                # check the liberties and keep track of the connected stones
+                visited = set()
+                borders = {
+                    PieceConfig.White: set(),
+                    PieceConfig.Black: set()
+                }
+                Rules.find_territories(boardArray, rIdx, cIdx, visited, borders)
+
+                for v in visited:
+                    checked.add(v)
+
+                if len(borders[PieceConfig.White]) > len(borders[PieceConfig.Black]):
+                    territories[0] += len(visited)
+                elif len(borders[PieceConfig.White]) < len(borders[PieceConfig.Black]):
+                    territories[1] += len(visited)
+
+        return territories
+
+    @staticmethod
+    def find_territories(boardArray: list[list[PieceColor]], row, col, visited, borders):
+        # Check if the position is on the board and has the same color
+        if not (0 <= row < len(boardArray) and 0 <= col < len(boardArray[0])):
+            return
+
+        piece = boardArray[row][col]
+        if piece != PieceConfig.NoPiece:
+            borders[piece].add((row, col))
+            return
+
+        # Check if the position has already been visited
+        if (row, col) in visited:
+            return
+
+        visited.add((row, col))  # Mark the position as visited
+
+        # Check liberties in adjacent positions
+        for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            next_row = row + dr
+            next_col = col + dc
+
+            Rules.find_territories(boardArray, next_row, next_col, visited, borders)
 

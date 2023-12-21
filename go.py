@@ -19,7 +19,6 @@ class Go(QMainWindow):
                                  range(self.boardSize)], {PieceConfig.Black: 0, PieceConfig.White: 0}, False)
         self.gameHistory.append(gameState)
 
-
         self.initUI()
 
     def onBoardFieldClicked(self, field):
@@ -27,10 +26,15 @@ class Go(QMainWindow):
         if Rules.checkLegalMove(currentGameState.boardArray, field):
             newBoardArray = currentGameState.boardArray.copy()
             newBoardArray[field.row][field.col] = self.currentPieceColor
+
             amountCaptured = Rules.try_captures(newBoardArray, self.currentPieceColor)
             newPrisoners = currentGameState.prisoners.copy()
             newPrisoners[getOpposite(self.currentPieceColor)] = newPrisoners[getOpposite(self.currentPieceColor)] + amountCaptured
+
+            print(Rules.calculate_territories(newBoardArray))
+
             self.gameHistory.append(GameState(self.currentPieceColor, newBoardArray, newPrisoners, False))
+
             self.board.boardArray = newBoardArray
             self.board.repaint()
             self.currentPieceColor = PieceConfig.White if self.currentPieceColor is PieceConfig.Black \
