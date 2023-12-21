@@ -81,9 +81,6 @@ class Board(QFrame):  # base the board on a QFrame widget
         if field.row < self.boardSize and field.col < self.boardSize:
             self.clickLocationSignal.emit(field)
 
-    def resetGame(self):
-        """clears pieces from the board"""
-        # TODO write code to reset game
 
     def drawBoardSquares(self, painter):
         """draw all the square on the board"""

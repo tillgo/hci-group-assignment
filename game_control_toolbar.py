@@ -3,7 +3,7 @@ from PyQt6.QtGui import QAction, QIcon, QPalette, QColor
 from PyQt6.QtWidgets import *
 
 
-class GameControlToolbar(QToolBar):
+class GameControlToolbar(QWidget):
     """
     Toolbar containing game controls, like passing od redo a move
     """
@@ -12,6 +12,8 @@ class GameControlToolbar(QToolBar):
         # Toolbar actions and widgets
         super().__init__(parent)
 
+        self.mainGrid = QGridLayout()
+        self.setStyleSheet("background: transparent;")
 
 
         # Create Undo Action
