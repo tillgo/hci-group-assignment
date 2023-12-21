@@ -23,7 +23,7 @@ class Go(QMainWindow):
         self.currentGameStateIndex = 0
 
         backgroundTexturePath = "./assets/goboard_background.jpg"
-        self.setStyleSheet("background-image: url({}); background-size: cover;".format(backgroundTexturePath))
+        self.setStyleSheet("background-image: url({});".format(backgroundTexturePath))
 
         self.initUI()
 
