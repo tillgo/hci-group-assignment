@@ -117,3 +117,15 @@ class Rules:
                          or Rules.find_liberties(boardArray, next_row, next_col, piece, visited))
 
         return liberties
+
+    @staticmethod
+    def calculate_stone_score(boardArray) -> dict[PieceColor, int]:
+        scores = {
+            PieceConfig.Black: 0,
+            PieceConfig.White: 0,
+        }
+        for row in boardArray:
+            for piece in row:
+                scores[piece] += 1
+
+        return scores

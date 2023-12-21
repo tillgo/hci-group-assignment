@@ -7,14 +7,10 @@ from rules import Rules
 
 
 class Board(QFrame):  # base the board on a QFrame widget
-    updateTimerSignal = pyqtSignal(int)  # signal sent when the timer is updated
     clickLocationSignal = pyqtSignal(Field)  # signal sent when there is a new click location
     mouseHoverSignal = pyqtSignal()  # signal sent when mouse is hovering over a field of the board
 
     illegalMoveColor = "#F32013"
-
-    timerSpeed = 1000  # the timer updates every 1 second
-    counter = 10  # the number the counter will count down from
 
     def __init__(self, parent, boardArray, currentPieceColor, checkLegalMove):
         super().__init__(parent)
@@ -27,19 +23,6 @@ class Board(QFrame):  # base the board on a QFrame widget
         # Enable Mouse Tracking
         self.setMouseTracking(True)
         self.currentHoverField = None
-
-        self.timer = QTimer(self)  # create a timer for the game
-        self.timer.timeout.connect(self.timerEvent)  # connect timeout signal to timerEvent method
-        self.isStarted = False  # game is not currently started
-
-
-
-        self.initBoard()
-
-    def initBoard(self):
-        """initiates board"""
-        self.start()  # start the game which will start the timer
-
 
     def subscribeToFieldClicked(self, func):
         """
@@ -65,22 +48,6 @@ class Board(QFrame):  # base the board on a QFrame widget
 
     def pieceRadius(self):
         return int(self.squareSize() / 2 - 20)
-
-    def start(self):
-        """starts game"""
-        self.isStarted = True  # set the boolean which determines if the game has started to TRUE
-        self.resetGame()  # reset the game
-        self.timer.start(self.timerSpeed)  # start the timer with the correct speed
-        print("start () - timer is started")
-
-    def timerEvent(self):
-        """this event is automatically called when the timer is updated. based on the timerSpeed variable """
-        # TODO adapt this code to handle your timers
-        if Board.counter == 0:
-            print("Game over")
-        self.counter -= 1
-        print('timerEvent()', self.counter)
-        self.updateTimerSignal[int].emit(self.counter)
 
     def paintEvent(self, event):
         painter = QPainter(self)

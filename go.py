@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import *
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import Qt, QSize, pyqtSignal, QTimer
 
+import PieceColor
 from board import Board
 from game_control_toolbar import GameControlToolbar
 from game_state import GameState
@@ -10,6 +11,12 @@ from score_board import ScoreBoard
 
 
 class Go(QMainWindow):
+    timerSignal = pyqtSignal(dict)
+
+    defaultTime = 120
+
+    timerSpeed = 1000  # the timer updates every 1 second
+    counter = 10  # the number the counter will count down from
 
     def __init__(self):
         super().__init__()
@@ -21,11 +28,40 @@ class Go(QMainWindow):
                                           False)
         self.gameHistory.append(self.defaultGameState)
         self.currentGameStateIndex = 0
+        self.isStarted = False
+
+        self.playerTimes = {
+            PieceConfig.Black: Go.defaultTime,
+            PieceConfig.White: Go.defaultTime,
+        }
+        self.timer = QTimer(self)  # create a timer for the game
+        self.timer.timeout.connect(self.timerEvent)  # connect timeout signal to timerEvent method
 
         backgroundTexturePath = "./assets/goboard_background.jpg"
         self.setStyleSheet("background-image: url({});".format(backgroundTexturePath))
 
-        self.initUI()
+        self.board = Board(self, self.gameHistory[-1].boardArray, self.currentPieceColor,
+                           self.onBoardHoverCheckLegalMove)
+        self.board.subscribeToFieldClicked(self.onBoardFieldClicked)
+        self.setCentralWidget(self.board)
+
+        self.scoreBoard = ScoreBoard()
+        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.scoreBoard)
+        self.scoreBoard.make_connection(self)
+
+        # Create Toolbar
+        self.toolbar = GameControlToolbar(self, self.onUndoMove, self.onRedoMove, self.onResetGame, self.onPass)
+        self.toolbar.setIconSize(QSize(30, 30))
+        self.toolbar.setStyleSheet("QToolBar{spacing:15px;}")
+
+        self.addToolBar(Qt.ToolBarArea.BottomToolBarArea, self.toolbar)
+
+        self.resize(800, 800)
+        self.center()
+        self.setWindowTitle('Go')
+        self.show()
+
+        self.start()
 
     def updateBoard(self):
         """
@@ -34,6 +70,17 @@ class Go(QMainWindow):
         self.board.boardArray = self.gameHistory[self.currentGameStateIndex].boardArray
         self.board.currentPieceColor = self.currentPieceColor
         self.board.repaint()
+
+    def start(self):
+        self.isStarted = True
+        self.timer.start(Go.timerSpeed)
+
+    def timerEvent(self):
+        self.playerTimes[self.currentPieceColor] -= 1
+        self.timerSignal[dict].emit(self.playerTimes)
+        if self.playerTimes[self.currentPieceColor] <= 0:
+            self.isStarted = False
+            # TODO: player x lost the game
 
     def onBoardFieldClicked(self, field):
         tmpGameHistory = self.gameHistory[:self.currentGameStateIndex + 1]
@@ -95,35 +142,6 @@ class Go(QMainWindow):
         return Rules.checkLegalMove(self.gameHistory[:self.currentGameStateIndex + 1],
                                     self.gameHistory[self.currentGameStateIndex].boardArray, field,
                                     self.currentPieceColor)
-
-    def getBoard(self):
-        return self.board
-
-    def getScoreBoard(self):
-        return self.scoreBoard
-
-    def initUI(self):
-        """Initiates application UI"""
-        self.board = Board(self, self.gameHistory[-1].boardArray, self.currentPieceColor,
-                           self.onBoardHoverCheckLegalMove)
-        self.board.subscribeToFieldClicked(self.onBoardFieldClicked)
-        self.setCentralWidget(self.board)
-
-        self.scoreBoard = ScoreBoard()
-        self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.scoreBoard)
-        self.scoreBoard.make_connection(self.board)
-
-        # Create Toolbar
-        self.toolbar = GameControlToolbar(self, self.onUndoMove, self.onRedoMove, self.onResetGame, self.onPass)
-        self.toolbar.setIconSize(QSize(30, 30))
-        self.toolbar.setStyleSheet("QToolBar{spacing:15px;}")
-
-        self.addToolBar(Qt.ToolBarArea.BottomToolBarArea, self.toolbar)
-
-        self.resize(800, 800)
-        self.center()
-        self.setWindowTitle('Go')
-        self.show()
 
     def center(self):
         """Centers the window on the screen"""
