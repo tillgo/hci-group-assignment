@@ -32,8 +32,7 @@ class Board(QFrame):  # base the board on a QFrame widget
         self.timer.timeout.connect(self.timerEvent)  # connect timeout signal to timerEvent method
         self.isStarted = False  # game is not currently started
 
-        backgroundTexturePath = "./assets/goboard_background.jpg"
-        self.setBackgroundTexture(backgroundTexturePath)
+
 
         self.initBoard()
 
@@ -41,9 +40,6 @@ class Board(QFrame):  # base the board on a QFrame widget
         """initiates board"""
         self.start()  # start the game which will start the timer
 
-    def setBackgroundTexture(self, image_path):
-        self.setFrameShape(QFrame.Shape.StyledPanel)
-        self.setStyleSheet("background-image: url({})".format(image_path))
 
     def subscribeToFieldClicked(self, func):
         """

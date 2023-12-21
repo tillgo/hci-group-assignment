@@ -22,6 +22,9 @@ class Go(QMainWindow):
         self.gameHistory.append(self.defaultGameState)
         self.currentGameStateIndex = 0
 
+        backgroundTexturePath = "./assets/goboard_background.jpg"
+        self.setStyleSheet("background-image: url({}); background-size: cover;".format(backgroundTexturePath))
+
         self.initUI()
 
     def updateBoard(self):
