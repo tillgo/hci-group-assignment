@@ -3,8 +3,9 @@ from PyQt6.QtCore import Qt, QSize, pyqtSignal, QTimer
 
 import PieceColor
 from board import Board
-from game_control_toolbar import GameControlToolbar
+from game_controls import GameControls
 from game_state import GameState
+from main_go_widget import MainGoWidget
 from piececonfig import PieceConfig, getOpposite
 from rules import Rules
 from score_board import ScoreBoard
@@ -41,20 +42,21 @@ class Go(QMainWindow):
         self.setStyleSheet("background-image: url({});".format(backgroundTexturePath))
 
         self.board = Board(self, self.gameHistory[-1].boardArray, self.currentPieceColor,
-                           self.onBoardHoverCheckLegalMove)
+                           self.onBoardHoverCheckLegalMove, self.onBoardRepaint)
         self.board.subscribeToFieldClicked(self.onBoardFieldClicked)
-        self.setCentralWidget(self.board)
+
+        # Create GameControls
+        self.gameControls = GameControls(self, self.onUndoMove, self.onRedoMove, self.onResetGame, self.onPass)
+        self.gameControls.updateSize(self.board.squareSize())
+        self.mainGoWidget = MainGoWidget(self.board, self.gameControls)
+
+        self.setCentralWidget(self.mainGoWidget)
 
         self.scoreBoard = ScoreBoard()
         self.addDockWidget(Qt.DockWidgetArea.RightDockWidgetArea, self.scoreBoard)
         self.scoreBoard.make_connection(self)
 
-        # Create Toolbar
-        self.toolbar = GameControlToolbar(self, self.onUndoMove, self.onRedoMove, self.onResetGame, self.onPass)
-        self.toolbar.setIconSize(QSize(30, 30))
-        self.toolbar.setStyleSheet("QToolBar{spacing:15px;}")
-
-        self.addToolBar(Qt.ToolBarArea.BottomToolBarArea, self.toolbar)
+        self.updateBoard()
 
         self.resize(800, 800)
         self.center()
@@ -63,10 +65,22 @@ class Go(QMainWindow):
 
         self.start()
 
+    def onBoardRepaint(self, size):
+        self.gameControls.updateSize(size)
+
     def updateBoard(self):
         """
-        Update boardArray and currentpiece color and redraw board
-        """
+        Update boardArray and currentpiece color, redraw board and  update game controls"""
+
+        self.gameControls.enableUndo()
+        self.gameControls.enableRedo()
+        if self.currentGameStateIndex == 0:
+            self.gameControls.disableUndo()
+
+        if self.currentGameStateIndex >= len(self.gameHistory) -1:
+            self.gameControls.disableRedo()
+
+
         self.board.boardArray = self.gameHistory[self.currentGameStateIndex].boardArray
         self.board.currentPieceColor = self.currentPieceColor
         self.board.repaint()
@@ -150,3 +164,5 @@ class Go(QMainWindow):
         x = (screen.width() - size.width()) // 2
         y = (screen.height() - size.height()) // 2
         self.move(x, y)
+
+

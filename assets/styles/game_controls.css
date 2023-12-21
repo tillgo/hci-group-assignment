@@ -1,0 +1,9 @@
+QPushButton {
+    border: none
+}
+
+QWidget {
+    background: transparent;
+
+}
+

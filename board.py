@@ -12,11 +12,12 @@ class Board(QFrame):  # base the board on a QFrame widget
 
     illegalMoveColor = "#F32013"
 
-    def __init__(self, parent, boardArray, currentPieceColor, checkLegalMove):
+    def __init__(self, parent, boardArray, currentPieceColor, checkLegalMove, onRepaint):
         super().__init__(parent)
         self.boardArray = boardArray
         self.currentPieceColor = currentPieceColor
         self.checkLegalMove = checkLegalMove
+        self.onRepaint = onRepaint
 
         self.boardSize = len(boardArray)
         self.mouseHoverSignal.connect(self.repaint)
@@ -52,6 +53,7 @@ class Board(QFrame):  # base the board on a QFrame widget
     def paintEvent(self, event):
         painter = QPainter(self)
         self.updateBoard(self.boardArray, painter)
+        self.onRepaint(self.squareSize())
         painter.end()
 
     def updateBoard(self, boardArray, painter):
