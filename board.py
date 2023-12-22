@@ -78,6 +78,7 @@ class Board(QFrame):  # base the board on a QFrame widget
 
     def leaveEvent(self, event) -> None:
         self.currentHoverField = None
+        self.mouseHoverSignal.emit()
 
     def mousePressEvent(self, event):
         """this event is automatically called when the mouse is pressed"""
