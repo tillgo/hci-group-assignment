@@ -2,6 +2,11 @@ QPushButton {
     border: none
 }
 
+QPushButton:hover {
+    background-color: rgba(133,94,66, 80);
+}
+
+
 QWidget {
     background: transparent;
 

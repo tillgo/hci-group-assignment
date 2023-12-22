@@ -32,6 +32,7 @@ class GameControls(QWidget):
         self.mainLayout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignBottom)
         self.setLayout(self.mainLayout)
 
+        # ToDo sich für eines der Icon-Arten entscheiden
         # SpacerItem to make padding on left side of elements
         self.spacerItem = QWidget()
         self.spacerItem.setFixedHeight(0)
@@ -39,24 +40,25 @@ class GameControls(QWidget):
 
         # Create Undo button
         self.btnUndo = QPushButton()
-        self.btnUndo.setIcon(QIcon("./assets/icons/undo.png"))
+        self.btnUndo.setIcon(QIcon("assets/icons/undo_1.png"))
         self.btnUndo.clicked.connect(onUndo)
         self.btnUndo.setToolTip("Undo Move")
 
         # Create Redo button
         self.btnRedo = QPushButton()
-        self.btnRedo.setIcon(QIcon("./assets/icons/redo.png"))
+        self.btnRedo.setIcon(QIcon("assets/icons/redo_1.png"))
         self.btnRedo.clicked.connect(onRedo)
         self.btnRedo.setToolTip("Redo Move")
 
         # Create reset button
         self.btnReset = QPushButton()
-        self.btnReset.setIcon(QIcon("./assets/icons/reset.png"))
+        self.btnReset.setIcon(QIcon("assets/icons/reset_1.png"))
         self.btnReset.clicked.connect(onReset)
         self.btnReset.setToolTip("Reset Game")
 
         # create pass button
-        self.btnPass = QPushButton("Pass")
+        self.btnPass = QPushButton()
+        self.btnPass.setIcon(QIcon("assets/icons/pass_icon.png"))
         self.btnPass.clicked.connect(onPass)
 
         self.buttons = [self.btnUndo, self.btnRedo, self.btnReset, self.btnPass]
@@ -71,14 +73,12 @@ class GameControls(QWidget):
         self.updateSize(50)
 
     def updateSize(self, size):
-        btnSize = int(size * 0.4)
+        btnSize = int(size * 0.5)
         spacingSize = size - btnSize
         self.mainLayout.setSpacing(spacingSize)
         for btn in self.buttons:
             btn.setIconSize(QSize(btnSize, btnSize))
-            font = QFont()
-            font.setPointSize(max(int(btnSize / 1.8), 1))
-            btn.setFont(font)
+
 
     def disableUndo(self):
         self.btnUndo.setDisabled(True)
