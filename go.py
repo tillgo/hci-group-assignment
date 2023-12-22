@@ -24,10 +24,8 @@ class Go(QMainWindow):
         self.gameHistory = []
         self.boardSize = 7
         self.currentPieceColor = PieceConfig.Black
-        self.defaultGameState = GameState(None, [[PieceConfig.NoPiece for _ in range(self.boardSize)] for _ in
-                                                 range(self.boardSize)], {PieceConfig.Black: 0, PieceConfig.White: 0},
-                                          False, {PieceConfig.Black: Go.defaultTime, PieceConfig.White: Go.defaultTime})
-        self.gameHistory.append(self.defaultGameState)
+
+        self.gameHistory.append(self.getDefaultGameState())
         self.currentGameStateIndex = 0
         self.isStarted = False
         self.consecutivePasses = 0
@@ -62,6 +60,12 @@ class Go(QMainWindow):
         self.show()
 
         self.start()
+
+
+    def getDefaultGameState(self):
+        return GameState(None, [[PieceConfig.NoPiece for _ in range(self.boardSize)] for _ in
+                                                 range(self.boardSize)], {PieceConfig.Black: 0, PieceConfig.White: 0},
+                                          False, {PieceConfig.Black: Go.defaultTime, PieceConfig.White: Go.defaultTime})
 
     def onBoardRepaint(self, size):
         self.gameControls.updateSize(size)
@@ -140,7 +144,7 @@ class Go(QMainWindow):
     def onResetGame(self):
         """Callback function for board object"""
         self.gameHistory = []
-        self.gameHistory.append(self.defaultGameState)
+        self.gameHistory.append(self.getDefaultGameState())
         self.currentGameStateIndex = 0
         self.currentPieceColor = PieceConfig.Black
         self.isStarted = True
@@ -148,6 +152,7 @@ class Go(QMainWindow):
             PieceConfig.Black: Go.defaultTime,
             PieceConfig.White: Go.defaultTime,
         }
+        self.consecutivePasses = 0
         self.updateBoard()
 
     def onPass(self):
@@ -167,7 +172,7 @@ class Go(QMainWindow):
         self.updateBoard()
 
         self.consecutivePasses += 1
-        if self.consecutivePasses == 2:
+        if self.consecutivePasses >= 2:
             scores = Rules.calculate_stone_score(self.gameHistory[self.currentGameStateIndex].boardArray)
             winner = PieceConfig.White if scores[PieceConfig.White] >= scores[PieceConfig.Black] else PieceConfig.Black
             self.endGame(winner)

@@ -1,5 +1,5 @@
 
-QGraphicsView, QLabel {
+QGraphicsView {
         background: transparent;
     }
 
@@ -8,5 +8,6 @@ QPushButton {
 }
 
 QLabel {
-    color: rgb(101, 49, 16);
+    background: rgba(255,255,255, 150);
+    border-radius: 8px;
 }
