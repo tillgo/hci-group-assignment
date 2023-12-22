@@ -126,6 +126,7 @@ class Rules:
         }
         for row in boardArray:
             for piece in row:
-                scores[piece] += 1
+                if piece != PieceConfig.NoPiece:
+                    scores[piece] += 1
 
         return scores

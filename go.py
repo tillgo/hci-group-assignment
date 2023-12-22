@@ -13,11 +13,11 @@ from score_board import ScoreBoard
 
 class Go(QMainWindow):
     timerSignal = pyqtSignal(dict)
+    movePlayedSignal = pyqtSignal(dict)
 
-    defaultTime = 120
-
+    defaultTime = 120  # the default player time in seconds
     timerSpeed = 1000  # the timer updates every 1 second
-    counter = 10  # the number the counter will count down from
+    timeIncrement = 5  # the default time increment on a move in seconds
 
     def __init__(self):
         super().__init__()
@@ -26,21 +26,18 @@ class Go(QMainWindow):
         self.currentPieceColor = PieceConfig.Black
         self.defaultGameState = GameState(None, [[PieceConfig.NoPiece for _ in range(self.boardSize)] for _ in
                                                  range(self.boardSize)], {PieceConfig.Black: 0, PieceConfig.White: 0},
-                                          False)
+                                          False, {PieceConfig.Black: Go.defaultTime, PieceConfig.White: Go.defaultTime})
         self.gameHistory.append(self.defaultGameState)
         self.currentGameStateIndex = 0
         self.isStarted = False
         self.consecutivePasses = 0
 
-        self.playerTimes = {
-            PieceConfig.Black: Go.defaultTime,
-            PieceConfig.White: Go.defaultTime,
-        }
+        self.playerTimes = None  # gets set with default game state later
         self.timer = QTimer(self)  # create a timer for the game
         self.timer.timeout.connect(self.timerEvent)  # connect timeout signal to timerEvent method
 
         backgroundTexturePath = "./assets/goboard_background.jpg"
-        self.setStyleSheet("background-image: url({});".format(backgroundTexturePath))
+        self.setStyleSheet("background: url({});".format(backgroundTexturePath))
 
         self.board = Board(self, self.gameHistory[-1].boardArray, self.currentPieceColor,
                            self.onBoardHoverCheckLegalMove, self.onBoardRepaint)
@@ -83,6 +80,14 @@ class Go(QMainWindow):
 
         self.board.boardArray = self.gameHistory[self.currentGameStateIndex].boardArray
         self.board.currentPieceColor = self.currentPieceColor
+        self.playerTimes = self.gameHistory[self.currentGameStateIndex].startTimes.copy()
+
+        self.movePlayedSignal[dict].emit({
+            "currentPieceColor": self.currentPieceColor,
+            "prisoners": self.gameHistory[self.currentGameStateIndex].prisoners,
+            "scores": Rules.calculate_stone_score(self.gameHistory[self.currentGameStateIndex].boardArray),
+            "times": self.playerTimes,
+        })
         self.board.repaint()
 
     def start(self):
@@ -90,11 +95,11 @@ class Go(QMainWindow):
         self.timer.start(Go.timerSpeed)
 
     def timerEvent(self):
-        self.playerTimes[self.currentPieceColor] -= 1
-        self.timerSignal[dict].emit(self.playerTimes)
-        if self.playerTimes[self.currentPieceColor] <= 0:
-            self.isStarted = False
-            # TODO: player x lost the game
+        if self.isStarted:
+            self.playerTimes[self.currentPieceColor] -= 1
+            self.timerSignal[dict].emit(self.playerTimes)
+            if self.playerTimes[self.currentPieceColor] <= 0:
+                self.endGame(getOpposite(self.currentPieceColor))
 
     def onBoardFieldClicked(self, field):
         tmpGameHistory = self.gameHistory[:self.currentGameStateIndex + 1]
@@ -105,9 +110,12 @@ class Go(QMainWindow):
             newBoardArray[field.row][field.col] = self.currentPieceColor
             amountCaptured = Rules.try_captures(newBoardArray, self.currentPieceColor)
             newPrisoners = currentGameState.prisoners.copy()
-            newPrisoners[getOpposite(self.currentPieceColor)] = newPrisoners[getOpposite(
-                self.currentPieceColor)] + amountCaptured
-            self.gameHistory.append(GameState(self.currentPieceColor, newBoardArray, newPrisoners, False))
+            newPrisoners[self.currentPieceColor] = newPrisoners[self.currentPieceColor] + amountCaptured
+            newTimes = self.playerTimes.copy()
+            newTimes[self.currentPieceColor] += self.timeIncrement
+            self.gameHistory.append(GameState(
+                self.currentPieceColor, newBoardArray, newPrisoners, False, newTimes)
+            )
             self.currentGameStateIndex += 1
             self.currentPieceColor = getOpposite(self.currentPieceColor)
             self.consecutivePasses = 0
@@ -135,6 +143,11 @@ class Go(QMainWindow):
         self.gameHistory.append(self.defaultGameState)
         self.currentGameStateIndex = 0
         self.currentPieceColor = PieceConfig.Black
+        self.isStarted = True
+        self.playerTimes = {
+            PieceConfig.Black: Go.defaultTime,
+            PieceConfig.White: Go.defaultTime,
+        }
         self.updateBoard()
 
     def onPass(self):
@@ -143,7 +156,9 @@ class Go(QMainWindow):
         """
         self.consecutivePasses += 1
         if self.consecutivePasses == 2:
-            self.endGame()
+            scores = Rules.calculate_stone_score(self.gameHistory[self.currentGameStateIndex].boardArray)
+            winner = PieceConfig.White if scores[PieceConfig.White] >= scores[PieceConfig.Black] else PieceConfig.Black
+            self.endGame(winner)
             return
 
         self.gameHistory = self.gameHistory[:self.currentGameStateIndex + 1]
@@ -152,7 +167,7 @@ class Go(QMainWindow):
         # Give one stone to enemy player (rule if you pass)
         newPrisoners[self.currentPieceColor] = newPrisoners[self.currentPieceColor] + 1
         # Create new GameState with unchanged boardArray, updated prisoners and isPass set to True
-        newGameState = GameState(self.currentPieceColor, lastGameState.boardArray, newPrisoners, True)
+        newGameState = GameState(self.currentPieceColor, lastGameState.boardArray, newPrisoners, True, self.playerTimes.copy())
         self.gameHistory.append(newGameState)
         self.currentGameStateIndex += 1
         self.currentPieceColor = getOpposite(self.currentPieceColor)
@@ -163,8 +178,10 @@ class Go(QMainWindow):
                                     self.gameHistory[self.currentGameStateIndex].boardArray, field,
                                     self.currentPieceColor)
 
-    def endGame(self):
-        self.mainGoWidget.showWinningScreen("Player 1", self.newGame)
+    def endGame(self, winner: PieceColor):
+        self.isStarted = False
+        winnerName = "White" if winner == PieceConfig.White else "Black"
+        self.mainGoWidget.showWinningScreen(winnerName, self.newGame)
 
     def newGame(self):
         self.onResetGame()

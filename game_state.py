@@ -5,7 +5,8 @@ class GameState:
     """
     Class containing information about specific game (board) state
     """
-    def __init__(self, player: PieceColor, boardArray: list[list[PieceColor]], prisoners: dict[PieceColor, int], isPass: bool):
+    def __init__(self, player: PieceColor, boardArray: list[list[PieceColor]], prisoners: dict[PieceColor, int], isPass: bool,
+                 startTimes: dict[PieceColor, int]):
         """
         Initialize GameState
 
@@ -19,3 +20,4 @@ class GameState:
         self.boardArray = boardArray
         self.prisoners = prisoners
         self.isPass = isPass
+        self.startTimes = startTimes
