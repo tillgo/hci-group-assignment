@@ -6,3 +6,7 @@ QGraphicsView, QLabel {
 QPushButton {
     background: white;
 }
+
+QLabel {
+    color: rgb(101, 49, 16);
+}

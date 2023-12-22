@@ -154,24 +154,24 @@ class Go(QMainWindow):
         """
         Callback function for board object
         """
-        self.consecutivePasses += 1
-        if self.consecutivePasses == 2:
-            scores = Rules.calculate_stone_score(self.gameHistory[self.currentGameStateIndex].boardArray)
-            winner = PieceConfig.White if scores[PieceConfig.White] >= scores[PieceConfig.Black] else PieceConfig.Black
-            self.endGame(winner)
-            return
-
         self.gameHistory = self.gameHistory[:self.currentGameStateIndex + 1]
         lastGameState = self.gameHistory[-1]
         newPrisoners = lastGameState.prisoners
         # Give one stone to enemy player (rule if you pass)
-        newPrisoners[self.currentPieceColor] = newPrisoners[self.currentPieceColor] + 1
+        newPrisoners[getOpposite(self.currentPieceColor)] = newPrisoners[getOpposite(self.currentPieceColor)] + 1
         # Create new GameState with unchanged boardArray, updated prisoners and isPass set to True
         newGameState = GameState(self.currentPieceColor, lastGameState.boardArray, newPrisoners, True, self.playerTimes.copy())
         self.gameHistory.append(newGameState)
         self.currentGameStateIndex += 1
         self.currentPieceColor = getOpposite(self.currentPieceColor)
         self.updateBoard()
+
+        self.consecutivePasses += 1
+        if self.consecutivePasses == 2:
+            scores = Rules.calculate_stone_score(self.gameHistory[self.currentGameStateIndex].boardArray)
+            winner = PieceConfig.White if scores[PieceConfig.White] >= scores[PieceConfig.Black] else PieceConfig.Black
+            self.endGame(winner)
+            return
 
     def onBoardHoverCheckLegalMove(self, field):
         return Rules.checkLegalMove(self.gameHistory[:self.currentGameStateIndex + 1],

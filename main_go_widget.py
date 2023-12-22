@@ -37,4 +37,5 @@ class MainGoWidget(QWidget):
             - onOkay: Callback when okay button on winning screen is clicked
         """
         self.mainLayout.addWidget(WinningScreen(self.mainLayout.sizeHint().height(),
-                                            self.mainLayout.sizeHint().width(), winner, onOkay), 0, 0, 9, 0)
+                                            self.mainLayout.sizeHint().width(), winner, onOkay), 0, 0, 9, 0,
+                                            alignment=Qt.AlignmentFlag.AlignRight)
