@@ -64,7 +64,7 @@ class GameControls(QWidget):
         for btn in self.buttons:
             btn.setIconSize(QSize(btnSize, btnSize))
             font = QFont()
-            font.setPointSize(int(btnSize / 1.8))
+            font.setPointSize(max(int(btnSize / 1.8), 1))
             btn.setFont(font)
 
     def disableUndo(self):

@@ -1,0 +1,8 @@
+
+QGraphicsView, QLabel {
+        background: transparent;
+    }
+
+QPushButton {
+    background: white;
+}

@@ -1,6 +1,8 @@
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QWidget, QGridLayout
 
+from winning_screen import WinningScreen
+
 
 class MainGoWidget(QWidget):
 
@@ -12,3 +14,6 @@ class MainGoWidget(QWidget):
         self.mainLayout.addWidget(gameControls, 0, 0)
         self.mainLayout.addWidget(board, 1, 0, 9, 0)
 
+    def showWinningScreen(self, winner, onOkay):
+        self.mainLayout.addWidget(WinningScreen(self.mainLayout.sizeHint().height(),
+                                            self.mainLayout.sizeHint().width(), winner, onOkay), 0, 0, 9, 0)

@@ -30,6 +30,7 @@ class Go(QMainWindow):
         self.gameHistory.append(self.defaultGameState)
         self.currentGameStateIndex = 0
         self.isStarted = False
+        self.consecutivePasses = 0
 
         self.playerTimes = {
             PieceConfig.Black: Go.defaultTime,
@@ -77,9 +78,8 @@ class Go(QMainWindow):
         if self.currentGameStateIndex == 0:
             self.gameControls.disableUndo()
 
-        if self.currentGameStateIndex >= len(self.gameHistory) -1:
+        if self.currentGameStateIndex >= len(self.gameHistory) - 1:
             self.gameControls.disableRedo()
-
 
         self.board.boardArray = self.gameHistory[self.currentGameStateIndex].boardArray
         self.board.currentPieceColor = self.currentPieceColor
@@ -110,6 +110,7 @@ class Go(QMainWindow):
             self.gameHistory.append(GameState(self.currentPieceColor, newBoardArray, newPrisoners, False))
             self.currentGameStateIndex += 1
             self.currentPieceColor = getOpposite(self.currentPieceColor)
+            self.consecutivePasses = 0
             self.updateBoard()
 
     def onUndoMove(self):
@@ -140,12 +141,17 @@ class Go(QMainWindow):
         """
         Callback function for board object
         """
+        self.consecutivePasses += 1
+        if self.consecutivePasses == 2:
+            self.endGame()
+            return
+
         self.gameHistory = self.gameHistory[:self.currentGameStateIndex + 1]
         lastGameState = self.gameHistory[-1]
         newPrisoners = lastGameState.prisoners
         # Give one stone to enemy player (rule if you pass)
         newPrisoners[self.currentPieceColor] = newPrisoners[self.currentPieceColor] + 1
-        # Create new GameState with with unchanged boardArray, updated prisoners and isPass set to True
+        # Create new GameState with unchanged boardArray, updated prisoners and isPass set to True
         newGameState = GameState(self.currentPieceColor, lastGameState.boardArray, newPrisoners, True)
         self.gameHistory.append(newGameState)
         self.currentGameStateIndex += 1
@@ -157,6 +163,14 @@ class Go(QMainWindow):
                                     self.gameHistory[self.currentGameStateIndex].boardArray, field,
                                     self.currentPieceColor)
 
+    def endGame(self):
+        self.mainGoWidget.showWinningScreen("Player 1", self.newGame)
+
+    def newGame(self):
+        self.onResetGame()
+        self.mainGoWidget = MainGoWidget(self.board, self.gameControls)
+        self.setCentralWidget(self.mainGoWidget)
+
     def center(self):
         """Centers the window on the screen"""
         screen = QApplication.primaryScreen().availableGeometry()
@@ -164,5 +178,3 @@ class Go(QMainWindow):
         x = (screen.width() - size.width()) // 2
         y = (screen.height() - size.height()) // 2
         self.move(x, y)
-
-
