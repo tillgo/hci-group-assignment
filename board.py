@@ -1,6 +1,9 @@
+from typing import Optional
+
 from PyQt6.QtCore import QTimer, pyqtSignal, QPoint, Qt
 from PyQt6.QtGui import QPainter, QColor, QBrush, QPen, QPalette, QPixmap, QImage
 from PyQt6.QtWidgets import QFrame
+from PyQt6.uic.properties import QtCore
 
 from field import Field
 from rules import Rules
@@ -66,12 +69,15 @@ class Board(QFrame):  # base the board on a QFrame widget
         col = round((event.position().x() - self.squareSize() / 2) / self.squareSize())
         row = round((event.position().y() - self.squareSize() / 2) / self.squareSize())
 
-        if row < self.boardSize and col < self.boardSize:
+        if self.boardSize > row >= 0 and self.boardSize > col >= 0:
             self.currentHoverField = Field(col, row)
         else:
             self.currentHoverField = None
 
         self.mouseHoverSignal.emit()
+
+    def leaveEvent(self, event) -> None:
+        self.currentHoverField = None
 
     def mousePressEvent(self, event):
         """this event is automatically called when the mouse is pressed"""
@@ -82,7 +88,6 @@ class Board(QFrame):  # base the board on a QFrame widget
         field = self.mousePosToColRow(event)
         if field.row < self.boardSize and field.col < self.boardSize:
             self.clickLocationSignal.emit(field)
-
 
     def drawBoardSquares(self, painter):
         """draw all the square on the board"""
