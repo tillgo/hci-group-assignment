@@ -47,7 +47,7 @@ class Go(QMainWindow):
         self.board.subscribeToFieldClicked(self.onBoardFieldClicked)
 
         # Create GameControls
-        self.gameControls = GameControls(self, self.onUndoMove, self.onRedoMove, self.onResetGame, self.onPass)
+        self.gameControls = GameControls(self.onUndoMove, self.onRedoMove, self.onResetGame, self.onPass)
         self.gameControls.updateSize(self.board.squareSize())
         self.mainGoWidget = MainGoWidget(self.board, self.gameControls)
 

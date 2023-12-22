@@ -1,3 +1,5 @@
+from typing import Callable
+
 from PyQt6.QtCore import Qt, QSize
 from PyQt6.QtGui import QAction, QIcon, QPalette, QColor, QFont
 from PyQt6.QtWidgets import *
@@ -8,9 +10,20 @@ class GameControls(QWidget):
     Toolbar containing game controls, like passing od redo a move
     """
 
-    def __init__(self, parent, onUndo, onRedo, onReset, onPass):
+    def __init__(self, onUndo: Callable[[None], None], onRedo: Callable[[None], None], onReset: Callable[[None], None],
+                 onPass: Callable[[None], None]):
+        """
+        Initialize GameControls
+
+        parameters:
+            - onUndo: Callback function when undo is clicked
+            - onRedo: Callback function when redo is clicked
+            - onReset: Callback function when reset is clicked
+            - onPass: Callback function when pass is clicked
+        """
+
         # Toolbar actions and widgets
-        super().__init__(parent)
+        super().__init__()
 
         with open('./assets/styles/game_controls.css', 'r') as file:
             self.setStyleSheet(file.read())

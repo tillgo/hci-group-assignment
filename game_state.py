@@ -1,6 +1,20 @@
-class GameState:
+from PieceColor import PieceColor
 
-    def __init__(self, player, boardArray, prisoners, isPass):
+
+class GameState:
+    """
+    Class containing information about specific game (board) state
+    """
+    def __init__(self, player: PieceColor, boardArray: list[list[PieceColor]], prisoners: dict[PieceColor, int], isPass: bool):
+        """
+        Initialize GameState
+
+        parameters:
+            - player: Player who is responsible for the current board state
+            - boardArray: Current board state
+            - prisoners: current state of prisoners
+            - isPass: Was the move a pass?
+        """
         self.player = player
         self.boardArray = boardArray
         self.prisoners = prisoners
