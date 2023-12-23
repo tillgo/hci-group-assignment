@@ -64,6 +64,15 @@ class Rules:
 
     @staticmethod
     def try_captures(boardArray: list[list[PieceColor]], placed: PieceColor) -> int:
+        """
+        This method is used to try stone captures for one color.
+
+        Parameters:
+            - boardArray: curren board layout
+            - placed: color of the last placed stone
+
+        Returns: amount of stones that were captured
+        """
         capturedCount = 0
         for rIdx, row in enumerate(boardArray):
             for cIdx, piece in enumerate(row):
@@ -120,6 +129,14 @@ class Rules:
 
     @staticmethod
     def calculate_stone_score(boardArray) -> dict[PieceColor, int]:
+        """
+        This method calculates the amount of stones each color has on the board.
+
+        Parameters:
+            - boardArray: curren board layout
+
+        Returns: dict with the values for each color.
+        """
         scores = {
             PieceConfig.Black: 0,
             PieceConfig.White: 0,

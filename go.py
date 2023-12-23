@@ -61,11 +61,10 @@ class Go(QMainWindow):
 
         self.start()
 
-
     def getDefaultGameState(self):
         return GameState(None, [[PieceConfig.NoPiece for _ in range(self.boardSize)] for _ in
-                                                 range(self.boardSize)], {PieceConfig.Black: 0, PieceConfig.White: 0},
-                                          False, {PieceConfig.Black: Go.defaultTime, PieceConfig.White: Go.defaultTime})
+                                range(self.boardSize)], {PieceConfig.Black: 0, PieceConfig.White: 0},
+                         False, {PieceConfig.Black: Go.defaultTime, PieceConfig.White: Go.defaultTime})
 
     def onBoardRepaint(self, size):
         self.gameControls.updateSize(size)
@@ -165,7 +164,8 @@ class Go(QMainWindow):
         # Give one stone to enemy player (rule if you pass)
         newPrisoners[getOpposite(self.currentPieceColor)] = newPrisoners[getOpposite(self.currentPieceColor)] + 1
         # Create new GameState with unchanged boardArray, updated prisoners and isPass set to True
-        newGameState = GameState(self.currentPieceColor, lastGameState.boardArray, newPrisoners, True, self.playerTimes.copy())
+        newGameState = GameState(self.currentPieceColor, lastGameState.boardArray, newPrisoners, True,
+                                 self.playerTimes.copy())
         self.gameHistory.append(newGameState)
         self.currentGameStateIndex += 1
         self.currentPieceColor = getOpposite(self.currentPieceColor)

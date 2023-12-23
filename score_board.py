@@ -5,6 +5,9 @@ from piececonfig import PieceConfig
 
 
 def seconds_to_mm_ss(time_in_seconds):
+    """
+    This method takes seconds as input and converts them to mm:ss format string
+    """
     # Calculate minutes and seconds
     minutes = time_in_seconds // 60
     seconds = time_in_seconds % 60
@@ -30,37 +33,43 @@ class ScoreBoard(QDockWidget):
         self.setWidget(self.mainWidget)
         self.setFixedWidth(200)
 
+        # create VBoxes for each player / color
         whiteBox = QVBoxLayout()
         blackBox = QVBoxLayout()
 
+        # create a form layout each, to hold score and prisoners
         whiteScore = QFormLayout()
         blackScore = QFormLayout()
 
+        # create labels for scores and prisoners
         self.whiteEstimate = QLabel("0", objectName="score")
         self.blackEstimate = QLabel("0", objectName="score")
         self.whitePrisoners = QLabel("0", objectName="score")
         self.blackPrisoners = QLabel("0", objectName="score")
 
+        # add scores and prisoners to the formLayouts
         whiteScore.addRow(QLabel("Score:", objectName="l"), self.whiteEstimate)
         whiteScore.addRow(QLabel("Prisoners:", objectName="l"), self.whitePrisoners)
         blackScore.addRow(QLabel("Score:", objectName="l"), self.blackEstimate)
         blackScore.addRow(QLabel("Prisoners:", objectName="l"), self.blackPrisoners)
 
+        # create labels for the timer
         self.timeWhite = QLabel(seconds_to_mm_ss(120), objectName="whiteTimer")
         self.timeBlack = QLabel(seconds_to_mm_ss(120), objectName="blackTimer")
 
+        # add timer and score layouts to the boxes
         whiteBox.addWidget(self.timeWhite)
         whiteBox.addLayout(whiteScore)
         blackBox.addLayout(blackScore)
         blackBox.addWidget(self.timeBlack)
 
+        # add layouts to main layout
         self.mainLayout.addLayout(whiteBox)
         self.mainLayout.addStretch(1)
         self.mainLayout.addLayout(blackBox)
 
     def make_connection(self, go):
-        """this handles a signal sent from the board class"""
-        # connect signals to update scoreboard
+        """this method is called to subscribe the scoreboard to go events"""
         go.timerSignal.connect(self.setTimeRemaining)
         go.movePlayedSignal.connect(self.updateScoreboard)
 
