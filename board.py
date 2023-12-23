@@ -102,8 +102,8 @@ class Board(QFrame):  # base the board on a QFrame widget
                 painter.restore()
 
     def drawPieces(self, painter, boardArray):
-        self.boardArray = boardArray
         """draw the pieces on the board"""
+        self.boardArray = boardArray
         for row in range(0, len(self.boardArray)):
             for col in range(0, len(self.boardArray[0])):
                 piece = self.boardArray[row][col]
