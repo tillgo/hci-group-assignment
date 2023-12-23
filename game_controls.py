@@ -39,19 +39,19 @@ class GameControls(QWidget):
 
         # Create Undo button
         self.btnUndo = QPushButton()
-        self.btnUndo.setIcon(QIcon("assets/icons/undo_1.png"))
+        self.btnUndo.setIcon(QIcon("assets/icons/undo.png"))
         self.btnUndo.clicked.connect(onUndo)
         self.btnUndo.setToolTip("Undo Move")
 
         # Create Redo button
         self.btnRedo = QPushButton()
-        self.btnRedo.setIcon(QIcon("assets/icons/redo_1.png"))
+        self.btnRedo.setIcon(QIcon("assets/icons/redo.png"))
         self.btnRedo.clicked.connect(onRedo)
         self.btnRedo.setToolTip("Redo Move")
 
         # Create reset button
         self.btnReset = QPushButton()
-        self.btnReset.setIcon(QIcon("assets/icons/reset_1.png"))
+        self.btnReset.setIcon(QIcon("assets/icons/reset.png"))
         self.btnReset.clicked.connect(onReset)
         self.btnReset.setToolTip("Reset Game")
 
