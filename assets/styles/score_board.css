@@ -27,3 +27,15 @@ QLabel#l {
     font-weight: 600;
     background: transparent;
 }
+
+QPushButton {
+    border: none;
+    text-decoration: underline;
+    font-size: 18px;
+    padding: 4px;
+}
+
+QPushButton:hover {
+    background: rgba(133,94,66, 80);
+    border-radius: 6px;
+}

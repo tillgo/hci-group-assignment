@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QDockWidget, QVBoxLayout, QWidget, QLabel, QFormLayout
 from PyQt6.QtCore import pyqtSlot
 
+from game_instruction_button import GameInstructionButton
 from piececonfig import PieceConfig
 
 
@@ -54,7 +55,11 @@ class ScoreBoard(QDockWidget):
         blackBox.addLayout(blackScore)
         blackBox.addWidget(self.timeBlack)
 
+        btnGameInstructions = GameInstructionButton()
+
         self.mainLayout.addLayout(whiteBox)
+        self.mainLayout.addStretch(1)
+        self.mainLayout.addWidget(btnGameInstructions)
         self.mainLayout.addStretch(1)
         self.mainLayout.addLayout(blackBox)
 
