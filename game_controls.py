@@ -32,7 +32,6 @@ class GameControls(QWidget):
         self.mainLayout.setAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignBottom)
         self.setLayout(self.mainLayout)
 
-        # ToDo sich für eines der Icon-Arten entscheiden
         # SpacerItem to make padding on left side of elements
         self.spacerItem = QWidget()
         self.spacerItem.setFixedHeight(0)

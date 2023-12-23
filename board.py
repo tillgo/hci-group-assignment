@@ -85,7 +85,7 @@ class Board(QFrame):  # base the board on a QFrame widget
         clickLoc = "click location [" + str(event.position().x()) + "," + str(
             event.position().y()) + "]"  # the location where a mouse click was registered
         print("mousePressEvent() - " + clickLoc)
-        # TODO you could call some game logic here
+
         field = self.mousePosToColRow(event)
         if field.row < self.boardSize and field.col < self.boardSize:
             self.clickLocationSignal.emit(field)
@@ -112,8 +112,7 @@ class Board(QFrame):  # base the board on a QFrame widget
                     painter.setBrush(QColor(piece.color))
                     painter.translate(col * self.squareSize() + self.squareSize() / 2,
                                       row * self.squareSize() + self.squareSize() / 2)
-                    # TODO draw some pieces as ellipses
-                    # TODO choose your color and set the painter brush to the correct color
+
                     radius = self.pieceRadius()
                     center = QPoint(0, 0)
                     painter.drawEllipse(center, radius, radius)

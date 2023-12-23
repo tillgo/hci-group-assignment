@@ -11,7 +11,6 @@ class Rules:
     @staticmethod
     def checkLegalMove(gameHistory: list[GameState], boardArray: list[list[PieceColor]], fieldToBePlaced: Field,
                        colorToBePlaced: PieceColor) -> bool:
-        # ToDo check if Move was move
         return (Rules.checkFieldUnoccupied(boardArray, fieldToBePlaced)
                 and not Rules.checkSuicideMove(boardArray, fieldToBePlaced, colorToBePlaced)
                 and Rules.checkKoRule(gameHistory, fieldToBePlaced, colorToBePlaced))
