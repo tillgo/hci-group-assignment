@@ -126,7 +126,9 @@ class Board(QFrame):  # base the board on a QFrame widget
 
             isLegalMove = self.checkLegalMove(self.currentHoverField)
             if isLegalMove:
-                painter.setBrush(QColor(self.currentPieceColor.color))
+                color = QColor(self.currentPieceColor.color)
+                color.setAlpha(140)
+                painter.setBrush(color)
                 radius = self.pieceRadius()
                 center = QPoint(0, 0)
                 painter.drawEllipse(center, radius, radius)
