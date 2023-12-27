@@ -51,7 +51,7 @@ class Board(QFrame):  # base the board on a QFrame widget
         return min(max_height, max_width)
 
     def pieceRadius(self):
-        return int(self.squareSize() / 2 - 20)
+        return int((self.squareSize() / 2) * 0.85)
 
     def paintEvent(self, event):
         painter = QPainter(self)
